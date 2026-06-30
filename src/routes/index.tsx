@@ -73,18 +73,19 @@ function Home() {
   const visible: Set<string> = new Set(Array.isArray(s.visibleSections) ? s.visibleSections : order);
   const navItems = order.filter((id) => visible.has(id)).map((id) => ({ id, label: SECTION_LABELS[id] ?? id }));
 
+  const d = data;
   function renderSection(id: string) {
     if (!visible.has(id)) return null;
     switch (id) {
       case "about":         return <About key={id} profile={profile} about={s.about ?? {}} />;
-      case "education":     return <Education key={id} rows={data.educations} />;
-      case "experience":    return <Experience key={id} rows={data.experiences} />;
-      case "skills":        return <Skills key={id} rows={data.skillGroups} />;
+      case "education":     return <Education key={id} rows={d.educations} />;
+      case "experience":    return <Experience key={id} rows={d.experiences} />;
+      case "skills":        return <Skills key={id} rows={d.skillGroups} />;
       case "research":      return <Research key={id} research={s.research ?? {}} />;
-      case "publications":  return <Publications key={id} rows={data.publications} />;
-      case "projects":      return <Projects key={id} rows={data.projects} />;
-      case "awards":        return <Awards key={id} rows={data.awards} />;
-      case "organizations": return <Organizations key={id} rows={data.organizations} />;
+      case "publications":  return <Publications key={id} rows={d.publications} />;
+      case "projects":      return <Projects key={id} rows={d.projects} />;
+      case "awards":        return <Awards key={id} rows={d.awards} />;
+      case "organizations": return <Organizations key={id} rows={d.organizations} />;
       case "contact":       return <Contact key={id} profile={profile} social={s.social ?? {}} cvUrl={s.media?.cvUrl} />;
       default: return null;
     }
