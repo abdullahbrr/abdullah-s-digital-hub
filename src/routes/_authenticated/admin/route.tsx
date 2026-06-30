@@ -18,6 +18,8 @@ import {
   Layers,
   LogOut,
   ExternalLink,
+  Feather,
+  Quote,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ADMIN_EMAIL, isAdminEmail } from "@/lib/admin-config";
@@ -31,12 +33,14 @@ type NavItem = { to: string; label: string; icon: typeof Home; exact?: boolean }
 const NAV: NavItem[] = [
   { to: "/admin", label: "Overview", icon: Home, exact: true },
   { to: "/admin/profile", label: "Hero & About", icon: User },
+  { to: "/admin/story", label: "Story & Quotes", icon: Quote },
   { to: "/admin/education", label: "Education", icon: GraduationCap },
   { to: "/admin/experience", label: "Experience", icon: Briefcase },
   { to: "/admin/skills", label: "Skills", icon: Wrench },
   { to: "/admin/research", label: "Research", icon: FlaskConical },
   { to: "/admin/publications", label: "Publications", icon: BookOpen },
   { to: "/admin/projects", label: "Projects", icon: FolderKanban },
+  { to: "/admin/writings", label: "Writing", icon: Feather },
   { to: "/admin/awards", label: "Awards", icon: Award },
   { to: "/admin/organizations", label: "Organizations", icon: Users },
   { to: "/admin/media", label: "Media & CV", icon: ImageIcon },
