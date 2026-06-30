@@ -10,11 +10,37 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedAdminSkillsRouteImport } from './routes/_authenticated/admin/skills'
+import { Route as AuthenticatedAdminSectionsRouteImport } from './routes/_authenticated/admin/sections'
+import { Route as AuthenticatedAdminResearchRouteImport } from './routes/_authenticated/admin/research'
+import { Route as AuthenticatedAdminPublicationsRouteImport } from './routes/_authenticated/admin/publications'
+import { Route as AuthenticatedAdminProjectsRouteImport } from './routes/_authenticated/admin/projects'
+import { Route as AuthenticatedAdminProfileRouteImport } from './routes/_authenticated/admin/profile'
+import { Route as AuthenticatedAdminOrganizationsRouteImport } from './routes/_authenticated/admin/organizations'
+import { Route as AuthenticatedAdminMediaRouteImport } from './routes/_authenticated/admin/media'
+import { Route as AuthenticatedAdminExperienceRouteImport } from './routes/_authenticated/admin/experience'
+import { Route as AuthenticatedAdminEducationRouteImport } from './routes/_authenticated/admin/education'
+import { Route as AuthenticatedAdminAwardsRouteImport } from './routes/_authenticated/admin/awards'
+import { Route as AuthenticatedAdminAppearanceRouteImport } from './routes/_authenticated/admin/appearance'
+import { Route as ApiPublicMediaSplatRouteImport } from './routes/api/public/media/$'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -22,31 +48,223 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminSkillsRoute =
+  AuthenticatedAdminSkillsRouteImport.update({
+    id: '/skills',
+    path: '/skills',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminSectionsRoute =
+  AuthenticatedAdminSectionsRouteImport.update({
+    id: '/sections',
+    path: '/sections',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminResearchRoute =
+  AuthenticatedAdminResearchRouteImport.update({
+    id: '/research',
+    path: '/research',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminPublicationsRoute =
+  AuthenticatedAdminPublicationsRouteImport.update({
+    id: '/publications',
+    path: '/publications',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminProjectsRoute =
+  AuthenticatedAdminProjectsRouteImport.update({
+    id: '/projects',
+    path: '/projects',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminProfileRoute =
+  AuthenticatedAdminProfileRouteImport.update({
+    id: '/profile',
+    path: '/profile',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminOrganizationsRoute =
+  AuthenticatedAdminOrganizationsRouteImport.update({
+    id: '/organizations',
+    path: '/organizations',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminMediaRoute = AuthenticatedAdminMediaRouteImport.update({
+  id: '/media',
+  path: '/media',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminExperienceRoute =
+  AuthenticatedAdminExperienceRouteImport.update({
+    id: '/experience',
+    path: '/experience',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminEducationRoute =
+  AuthenticatedAdminEducationRouteImport.update({
+    id: '/education',
+    path: '/education',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminAwardsRoute =
+  AuthenticatedAdminAwardsRouteImport.update({
+    id: '/awards',
+    path: '/awards',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminAppearanceRoute =
+  AuthenticatedAdminAppearanceRouteImport.update({
+    id: '/appearance',
+    path: '/appearance',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const ApiPublicMediaSplatRoute = ApiPublicMediaSplatRouteImport.update({
+  id: '/api/public/media/$',
+  path: '/api/public/media/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/admin/appearance': typeof AuthenticatedAdminAppearanceRoute
+  '/admin/awards': typeof AuthenticatedAdminAwardsRoute
+  '/admin/education': typeof AuthenticatedAdminEducationRoute
+  '/admin/experience': typeof AuthenticatedAdminExperienceRoute
+  '/admin/media': typeof AuthenticatedAdminMediaRoute
+  '/admin/organizations': typeof AuthenticatedAdminOrganizationsRoute
+  '/admin/profile': typeof AuthenticatedAdminProfileRoute
+  '/admin/projects': typeof AuthenticatedAdminProjectsRoute
+  '/admin/publications': typeof AuthenticatedAdminPublicationsRoute
+  '/admin/research': typeof AuthenticatedAdminResearchRoute
+  '/admin/sections': typeof AuthenticatedAdminSectionsRoute
+  '/admin/skills': typeof AuthenticatedAdminSkillsRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/public/media/$': typeof ApiPublicMediaSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/appearance': typeof AuthenticatedAdminAppearanceRoute
+  '/admin/awards': typeof AuthenticatedAdminAwardsRoute
+  '/admin/education': typeof AuthenticatedAdminEducationRoute
+  '/admin/experience': typeof AuthenticatedAdminExperienceRoute
+  '/admin/media': typeof AuthenticatedAdminMediaRoute
+  '/admin/organizations': typeof AuthenticatedAdminOrganizationsRoute
+  '/admin/profile': typeof AuthenticatedAdminProfileRoute
+  '/admin/projects': typeof AuthenticatedAdminProjectsRoute
+  '/admin/publications': typeof AuthenticatedAdminPublicationsRoute
+  '/admin/research': typeof AuthenticatedAdminResearchRoute
+  '/admin/sections': typeof AuthenticatedAdminSectionsRoute
+  '/admin/skills': typeof AuthenticatedAdminSkillsRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
+  '/api/public/media/$': typeof ApiPublicMediaSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/_authenticated/admin/appearance': typeof AuthenticatedAdminAppearanceRoute
+  '/_authenticated/admin/awards': typeof AuthenticatedAdminAwardsRoute
+  '/_authenticated/admin/education': typeof AuthenticatedAdminEducationRoute
+  '/_authenticated/admin/experience': typeof AuthenticatedAdminExperienceRoute
+  '/_authenticated/admin/media': typeof AuthenticatedAdminMediaRoute
+  '/_authenticated/admin/organizations': typeof AuthenticatedAdminOrganizationsRoute
+  '/_authenticated/admin/profile': typeof AuthenticatedAdminProfileRoute
+  '/_authenticated/admin/projects': typeof AuthenticatedAdminProjectsRoute
+  '/_authenticated/admin/publications': typeof AuthenticatedAdminPublicationsRoute
+  '/_authenticated/admin/research': typeof AuthenticatedAdminResearchRoute
+  '/_authenticated/admin/sections': typeof AuthenticatedAdminSectionsRoute
+  '/_authenticated/admin/skills': typeof AuthenticatedAdminSkillsRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/public/media/$': typeof ApiPublicMediaSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/sitemap.xml'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/sitemap.xml'
+    | '/admin'
+    | '/admin/appearance'
+    | '/admin/awards'
+    | '/admin/education'
+    | '/admin/experience'
+    | '/admin/media'
+    | '/admin/organizations'
+    | '/admin/profile'
+    | '/admin/projects'
+    | '/admin/publications'
+    | '/admin/research'
+    | '/admin/sections'
+    | '/admin/skills'
+    | '/admin/'
+    | '/api/public/media/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/sitemap.xml'
-  id: '__root__' | '/' | '/sitemap.xml'
+  to:
+    | '/'
+    | '/auth'
+    | '/sitemap.xml'
+    | '/admin/appearance'
+    | '/admin/awards'
+    | '/admin/education'
+    | '/admin/experience'
+    | '/admin/media'
+    | '/admin/organizations'
+    | '/admin/profile'
+    | '/admin/projects'
+    | '/admin/publications'
+    | '/admin/research'
+    | '/admin/sections'
+    | '/admin/skills'
+    | '/admin'
+    | '/api/public/media/$'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/sitemap.xml'
+    | '/_authenticated/admin'
+    | '/_authenticated/admin/appearance'
+    | '/_authenticated/admin/awards'
+    | '/_authenticated/admin/education'
+    | '/_authenticated/admin/experience'
+    | '/_authenticated/admin/media'
+    | '/_authenticated/admin/organizations'
+    | '/_authenticated/admin/profile'
+    | '/_authenticated/admin/projects'
+    | '/_authenticated/admin/publications'
+    | '/_authenticated/admin/research'
+    | '/_authenticated/admin/sections'
+    | '/_authenticated/admin/skills'
+    | '/_authenticated/admin/'
+    | '/api/public/media/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ApiPublicMediaSplatRoute: typeof ApiPublicMediaSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -58,6 +276,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -65,12 +297,169 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/skills': {
+      id: '/_authenticated/admin/skills'
+      path: '/skills'
+      fullPath: '/admin/skills'
+      preLoaderRoute: typeof AuthenticatedAdminSkillsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/sections': {
+      id: '/_authenticated/admin/sections'
+      path: '/sections'
+      fullPath: '/admin/sections'
+      preLoaderRoute: typeof AuthenticatedAdminSectionsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/research': {
+      id: '/_authenticated/admin/research'
+      path: '/research'
+      fullPath: '/admin/research'
+      preLoaderRoute: typeof AuthenticatedAdminResearchRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/publications': {
+      id: '/_authenticated/admin/publications'
+      path: '/publications'
+      fullPath: '/admin/publications'
+      preLoaderRoute: typeof AuthenticatedAdminPublicationsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/projects': {
+      id: '/_authenticated/admin/projects'
+      path: '/projects'
+      fullPath: '/admin/projects'
+      preLoaderRoute: typeof AuthenticatedAdminProjectsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/profile': {
+      id: '/_authenticated/admin/profile'
+      path: '/profile'
+      fullPath: '/admin/profile'
+      preLoaderRoute: typeof AuthenticatedAdminProfileRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/organizations': {
+      id: '/_authenticated/admin/organizations'
+      path: '/organizations'
+      fullPath: '/admin/organizations'
+      preLoaderRoute: typeof AuthenticatedAdminOrganizationsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/media': {
+      id: '/_authenticated/admin/media'
+      path: '/media'
+      fullPath: '/admin/media'
+      preLoaderRoute: typeof AuthenticatedAdminMediaRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/experience': {
+      id: '/_authenticated/admin/experience'
+      path: '/experience'
+      fullPath: '/admin/experience'
+      preLoaderRoute: typeof AuthenticatedAdminExperienceRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/education': {
+      id: '/_authenticated/admin/education'
+      path: '/education'
+      fullPath: '/admin/education'
+      preLoaderRoute: typeof AuthenticatedAdminEducationRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/awards': {
+      id: '/_authenticated/admin/awards'
+      path: '/awards'
+      fullPath: '/admin/awards'
+      preLoaderRoute: typeof AuthenticatedAdminAwardsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/appearance': {
+      id: '/_authenticated/admin/appearance'
+      path: '/appearance'
+      fullPath: '/admin/appearance'
+      preLoaderRoute: typeof AuthenticatedAdminAppearanceRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/api/public/media/$': {
+      id: '/api/public/media/$'
+      path: '/api/public/media/$'
+      fullPath: '/api/public/media/$'
+      preLoaderRoute: typeof ApiPublicMediaSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminAppearanceRoute: typeof AuthenticatedAdminAppearanceRoute
+  AuthenticatedAdminAwardsRoute: typeof AuthenticatedAdminAwardsRoute
+  AuthenticatedAdminEducationRoute: typeof AuthenticatedAdminEducationRoute
+  AuthenticatedAdminExperienceRoute: typeof AuthenticatedAdminExperienceRoute
+  AuthenticatedAdminMediaRoute: typeof AuthenticatedAdminMediaRoute
+  AuthenticatedAdminOrganizationsRoute: typeof AuthenticatedAdminOrganizationsRoute
+  AuthenticatedAdminProfileRoute: typeof AuthenticatedAdminProfileRoute
+  AuthenticatedAdminProjectsRoute: typeof AuthenticatedAdminProjectsRoute
+  AuthenticatedAdminPublicationsRoute: typeof AuthenticatedAdminPublicationsRoute
+  AuthenticatedAdminResearchRoute: typeof AuthenticatedAdminResearchRoute
+  AuthenticatedAdminSectionsRoute: typeof AuthenticatedAdminSectionsRoute
+  AuthenticatedAdminSkillsRoute: typeof AuthenticatedAdminSkillsRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
+  {
+    AuthenticatedAdminAppearanceRoute: AuthenticatedAdminAppearanceRoute,
+    AuthenticatedAdminAwardsRoute: AuthenticatedAdminAwardsRoute,
+    AuthenticatedAdminEducationRoute: AuthenticatedAdminEducationRoute,
+    AuthenticatedAdminExperienceRoute: AuthenticatedAdminExperienceRoute,
+    AuthenticatedAdminMediaRoute: AuthenticatedAdminMediaRoute,
+    AuthenticatedAdminOrganizationsRoute: AuthenticatedAdminOrganizationsRoute,
+    AuthenticatedAdminProfileRoute: AuthenticatedAdminProfileRoute,
+    AuthenticatedAdminProjectsRoute: AuthenticatedAdminProjectsRoute,
+    AuthenticatedAdminPublicationsRoute: AuthenticatedAdminPublicationsRoute,
+    AuthenticatedAdminResearchRoute: AuthenticatedAdminResearchRoute,
+    AuthenticatedAdminSectionsRoute: AuthenticatedAdminSectionsRoute,
+    AuthenticatedAdminSkillsRoute: AuthenticatedAdminSkillsRoute,
+    AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  }
+
+const AuthenticatedAdminRouteRouteWithChildren =
+  AuthenticatedAdminRouteRoute._addFileChildren(
+    AuthenticatedAdminRouteRouteChildren,
+  )
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ApiPublicMediaSplatRoute: ApiPublicMediaSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
