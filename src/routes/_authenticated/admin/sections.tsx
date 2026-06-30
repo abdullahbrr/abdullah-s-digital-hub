@@ -25,6 +25,7 @@ const ALL_SECTIONS: Record<string, string> = {
   research: "Research",
   publications: "Publications",
   projects: "Projects",
+  writings: "Writing",
   awards: "Awards",
   organizations: "Organizations",
   contact: "Contact",
