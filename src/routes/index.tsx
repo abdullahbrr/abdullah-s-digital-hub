@@ -8,9 +8,10 @@ import { Hero } from "@/components/portfolio/Hero";
 import {
   About, Awards, Contact, Education, Experience, Footer, Organizations, Projects, Publications, Research, Skills,
 } from "@/components/portfolio/Sections";
+import { QuoteBand, StoryTimeline, Writings, Reveal } from "@/components/portfolio/Interactive";
 
-const SITE_TITLE = "Abdullah Al Mamun — Technical Support Engineer & Renewable-Energy Researcher";
-const SITE_DESC = "Portfolio of Abdullah Al Mamun: B.Sc. EEE engineer building smart-metering systems, advancing photovoltaic research, and shipping award-winning ventures from Bangladesh.";
+const SITE_TITLE = "Abdullah Al Mamun — Engineer, Researcher & Writer";
+const SITE_DESC = "Portfolio of Abdullah Al Mamun: B.Sc. EEE engineer building smart-metering systems, advancing photovoltaic research, writing essays, and shipping award-winning ventures from Bangladesh.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -32,8 +33,8 @@ export const Route = createFileRoute("/")({
 
 const SECTION_LABELS: Record<string, string> = {
   about: "About", education: "Education", experience: "Experience", skills: "Skills",
-  research: "Research", publications: "Publications", projects: "Projects", awards: "Awards",
-  organizations: "Organizations", contact: "Contact",
+  research: "Research", publications: "Publications", projects: "Projects",
+  writings: "Writing", awards: "Awards", organizations: "Organizations", contact: "Contact",
 };
 
 const THEME_PRESET_VARS: Record<string, { brand: string; brand2: string; brand3: string }> = {
@@ -73,20 +74,26 @@ function Home() {
   const visible: Set<string> = new Set(Array.isArray(s.visibleSections) ? s.visibleSections : order);
   const navItems = order.filter((id) => visible.has(id)).map((id) => ({ id, label: SECTION_LABELS[id] ?? id }));
 
+  const quotes: Array<{ text: string; author?: string }> = Array.isArray(s.quotes) ? s.quotes : [];
+  const story = s.story ?? {};
+  // Sprinkle a rotating quote band between major content blocks.
+  const interludeAfter = new Set(["about", "experience", "publications"]);
+
   const d = data;
   function renderSection(id: string) {
     if (!visible.has(id)) return null;
     switch (id) {
-      case "about":         return <About key={id} profile={profile} about={s.about ?? {}} />;
-      case "education":     return <Education key={id} rows={d.educations} />;
-      case "experience":    return <Experience key={id} rows={d.experiences} />;
-      case "skills":        return <Skills key={id} rows={d.skillGroups} />;
-      case "research":      return <Research key={id} research={s.research ?? {}} />;
-      case "publications":  return <Publications key={id} rows={d.publications} />;
-      case "projects":      return <Projects key={id} rows={d.projects} />;
-      case "awards":        return <Awards key={id} rows={d.awards} />;
-      case "organizations": return <Organizations key={id} rows={d.organizations} />;
-      case "contact":       return <Contact key={id} profile={profile} social={s.social ?? {}} cvUrl={s.media?.cvUrl} />;
+      case "about":         return <Reveal key={id}><About profile={profile} about={s.about ?? {}} /></Reveal>;
+      case "education":     return <Reveal key={id}><Education rows={d.educations} /></Reveal>;
+      case "experience":    return <Reveal key={id}><Experience rows={d.experiences} /></Reveal>;
+      case "skills":        return <Reveal key={id}><Skills rows={d.skillGroups} /></Reveal>;
+      case "research":      return <Reveal key={id}><Research research={s.research ?? {}} /></Reveal>;
+      case "publications":  return <Reveal key={id}><Publications rows={d.publications} /></Reveal>;
+      case "projects":      return <Reveal key={id}><Projects rows={d.projects} /></Reveal>;
+      case "writings":      return <Writings key={id} rows={d.writings} />;
+      case "awards":        return <Reveal key={id}><Awards rows={d.awards} /></Reveal>;
+      case "organizations": return <Reveal key={id}><Organizations rows={d.organizations} /></Reveal>;
+      case "contact":       return <Reveal key={id}><Contact profile={profile} social={s.social ?? {}} cvUrl={s.media?.cvUrl} /></Reveal>;
       default: return null;
     }
   }
@@ -96,7 +103,18 @@ function Home() {
       <Nav name={profile.name ?? ""} initials={profile.initials ?? "AM"} sections={navItems} />
       <main id="main">
         <Hero profile={profile} portraitUrl={s.media?.portraitUrl} />
-        {order.map(renderSection)}
+        {quotes.length > 0 && (
+          <QuoteBand quotes={quotes.length > 1 ? [quotes[0]] : quotes} />
+        )}
+        {(story?.chapters?.length ?? 0) > 0 && <StoryTimeline story={story} />}
+        {order.map((id, idx) => (
+          <div key={id}>
+            {renderSection(id)}
+            {interludeAfter.has(id) && quotes[idx % quotes.length] && (
+              <QuoteBand quotes={[quotes[(idx + 1) % quotes.length]]} />
+            )}
+          </div>
+        ))}
       </main>
       <Footer name={profile.name ?? ""} location={profile.location ?? ""} />
     </div>

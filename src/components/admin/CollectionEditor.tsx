@@ -39,7 +39,8 @@ type Table =
   | "educations"
   | "awards"
   | "organizations"
-  | "skill_groups";
+  | "skill_groups"
+  | "writings";
 
 export function CollectionEditor({
   table,

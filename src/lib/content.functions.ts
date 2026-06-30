@@ -16,7 +16,7 @@ function makeClient() {
 
 async function loadSiteContent() {
   const supabase = makeClient();
-  const [settings, publications, projects, experiences, educations, awards, organizations, skills] =
+  const [settings, publications, projects, experiences, educations, awards, organizations, skills, writings] =
     await Promise.all([
       supabase.from("site_settings").select("data").eq("id", "global").maybeSingle(),
       supabase.from("publications").select("*").order("sort_order"),
@@ -26,6 +26,7 @@ async function loadSiteContent() {
       supabase.from("awards").select("*").order("sort_order"),
       supabase.from("organizations").select("*").order("sort_order"),
       supabase.from("skill_groups").select("*").order("sort_order"),
+      supabase.from("writings" as any).select("*").order("sort_order"),
     ]);
 
   return {
@@ -37,6 +38,7 @@ async function loadSiteContent() {
     awards: awards.data ?? [],
     organizations: organizations.data ?? [],
     skillGroups: skills.data ?? [],
+    writings: (writings.data ?? []) as any[],
   };
 }
 

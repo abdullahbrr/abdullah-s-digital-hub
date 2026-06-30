@@ -15,6 +15,8 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedAdminWritingsRouteImport } from './routes/_authenticated/admin/writings'
+import { Route as AuthenticatedAdminStoryRouteImport } from './routes/_authenticated/admin/story'
 import { Route as AuthenticatedAdminSkillsRouteImport } from './routes/_authenticated/admin/skills'
 import { Route as AuthenticatedAdminSectionsRouteImport } from './routes/_authenticated/admin/sections'
 import { Route as AuthenticatedAdminResearchRouteImport } from './routes/_authenticated/admin/research'
@@ -56,6 +58,17 @@ const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminWritingsRoute =
+  AuthenticatedAdminWritingsRouteImport.update({
+    id: '/writings',
+    path: '/writings',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminStoryRoute = AuthenticatedAdminStoryRouteImport.update({
+  id: '/story',
+  path: '/story',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
 const AuthenticatedAdminSkillsRoute =
@@ -152,6 +165,8 @@ export interface FileRoutesByFullPath {
   '/admin/research': typeof AuthenticatedAdminResearchRoute
   '/admin/sections': typeof AuthenticatedAdminSectionsRoute
   '/admin/skills': typeof AuthenticatedAdminSkillsRoute
+  '/admin/story': typeof AuthenticatedAdminStoryRoute
+  '/admin/writings': typeof AuthenticatedAdminWritingsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/media/$': typeof ApiPublicMediaSplatRoute
 }
@@ -171,6 +186,8 @@ export interface FileRoutesByTo {
   '/admin/research': typeof AuthenticatedAdminResearchRoute
   '/admin/sections': typeof AuthenticatedAdminSectionsRoute
   '/admin/skills': typeof AuthenticatedAdminSkillsRoute
+  '/admin/story': typeof AuthenticatedAdminStoryRoute
+  '/admin/writings': typeof AuthenticatedAdminWritingsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/api/public/media/$': typeof ApiPublicMediaSplatRoute
 }
@@ -193,6 +210,8 @@ export interface FileRoutesById {
   '/_authenticated/admin/research': typeof AuthenticatedAdminResearchRoute
   '/_authenticated/admin/sections': typeof AuthenticatedAdminSectionsRoute
   '/_authenticated/admin/skills': typeof AuthenticatedAdminSkillsRoute
+  '/_authenticated/admin/story': typeof AuthenticatedAdminStoryRoute
+  '/_authenticated/admin/writings': typeof AuthenticatedAdminWritingsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/media/$': typeof ApiPublicMediaSplatRoute
 }
@@ -215,6 +234,8 @@ export interface FileRouteTypes {
     | '/admin/research'
     | '/admin/sections'
     | '/admin/skills'
+    | '/admin/story'
+    | '/admin/writings'
     | '/admin/'
     | '/api/public/media/$'
   fileRoutesByTo: FileRoutesByTo
@@ -234,6 +255,8 @@ export interface FileRouteTypes {
     | '/admin/research'
     | '/admin/sections'
     | '/admin/skills'
+    | '/admin/story'
+    | '/admin/writings'
     | '/admin'
     | '/api/public/media/$'
   id:
@@ -255,6 +278,8 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/research'
     | '/_authenticated/admin/sections'
     | '/_authenticated/admin/skills'
+    | '/_authenticated/admin/story'
+    | '/_authenticated/admin/writings'
     | '/_authenticated/admin/'
     | '/api/public/media/$'
   fileRoutesById: FileRoutesById
@@ -309,6 +334,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/writings': {
+      id: '/_authenticated/admin/writings'
+      path: '/writings'
+      fullPath: '/admin/writings'
+      preLoaderRoute: typeof AuthenticatedAdminWritingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/story': {
+      id: '/_authenticated/admin/story'
+      path: '/story'
+      fullPath: '/admin/story'
+      preLoaderRoute: typeof AuthenticatedAdminStoryRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/admin/skills': {
@@ -418,6 +457,8 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminResearchRoute: typeof AuthenticatedAdminResearchRoute
   AuthenticatedAdminSectionsRoute: typeof AuthenticatedAdminSectionsRoute
   AuthenticatedAdminSkillsRoute: typeof AuthenticatedAdminSkillsRoute
+  AuthenticatedAdminStoryRoute: typeof AuthenticatedAdminStoryRoute
+  AuthenticatedAdminWritingsRoute: typeof AuthenticatedAdminWritingsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
@@ -435,6 +476,8 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminResearchRoute: AuthenticatedAdminResearchRoute,
     AuthenticatedAdminSectionsRoute: AuthenticatedAdminSectionsRoute,
     AuthenticatedAdminSkillsRoute: AuthenticatedAdminSkillsRoute,
+    AuthenticatedAdminStoryRoute: AuthenticatedAdminStoryRoute,
+    AuthenticatedAdminWritingsRoute: AuthenticatedAdminWritingsRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   }
 
@@ -464,13 +507,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

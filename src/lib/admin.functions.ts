@@ -36,7 +36,8 @@ type Table =
   | "educations"
   | "awards"
   | "organizations"
-  | "skill_groups";
+  | "skill_groups"
+  | "writings";
 
 export const upsertCollectionItem = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
