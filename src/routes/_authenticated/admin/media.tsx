@@ -60,21 +60,21 @@ function MediaAdmin() {
           <h2 className="mb-3 font-display text-lg font-bold">Portrait</h2>
           {media.portraitUrl && <img src={media.portraitUrl} alt="" className="mb-4 max-h-64 rounded-xl border border-border object-cover" />}
           <FileButton accept="image/*" onPick={(f) => handleFile("portraitUrl", f)} label="Upload portrait" />
-          <Field label="Or paste URL"><TextInput value={media.portraitUrl ?? ""} onChange={(e) => setMedia({ portraitUrl: e.target.value })} onBlur={() => save.mutate()} /></Field>
+          <Field label="Or paste URL"><TextInput value={media.portraitUrl ?? ""} onChange={(e) => setMedia({ portraitUrl: e.target.value })} onBlur={() => save.mutate(undefined)} /></Field>
         </Card>
 
         <Card>
           <h2 className="mb-3 font-display text-lg font-bold">Logo (optional)</h2>
           {media.logoUrl && <img src={media.logoUrl} alt="" className="mb-4 max-h-16 rounded border border-border object-contain" />}
           <FileButton accept="image/*" onPick={(f) => handleFile("logoUrl", f)} label="Upload logo" />
-          <Field label="Or paste URL"><TextInput value={media.logoUrl ?? ""} onChange={(e) => setMedia({ logoUrl: e.target.value })} onBlur={() => save.mutate()} /></Field>
+          <Field label="Or paste URL"><TextInput value={media.logoUrl ?? ""} onChange={(e) => setMedia({ logoUrl: e.target.value })} onBlur={() => save.mutate(undefined)} /></Field>
         </Card>
 
         <Card>
           <h2 className="mb-3 font-display text-lg font-bold">CV (PDF)</h2>
           {media.cvUrl && <p className="mb-3 text-sm"><a href={media.cvUrl} target="_blank" rel="noopener noreferrer" className="text-gradient-brand">View current CV →</a></p>}
           <FileButton accept="application/pdf" onPick={(f) => handleFile("cvUrl", f)} label="Upload CV PDF" />
-          <Field label="Or paste URL"><TextInput value={media.cvUrl ?? ""} onChange={(e) => setMedia({ cvUrl: e.target.value })} onBlur={() => save.mutate()} /></Field>
+          <Field label="Or paste URL"><TextInput value={media.cvUrl ?? ""} onChange={(e) => setMedia({ cvUrl: e.target.value })} onBlur={() => save.mutate(undefined)} /></Field>
         </Card>
       </div>
       {view}
