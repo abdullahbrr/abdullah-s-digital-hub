@@ -1,18 +1,22 @@
 // Admin-only server functions. Every writer asserts the caller is the
-// hardcoded admin email, then uses the service-role client to bypass RLS.
+// hardcoded admin email, then uses the authenticated Supabase client from
+// the auth middleware (context.supabase) to write through RLS policies.
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { isAdminEmail } from "./admin-config";
 
-type ServerCtx = { userId: string; claims: { email?: string } & Record<string, any> };
+type ServerCtx = {
+  userId: string;
+  claims: { email?: string } & Record<string, any>;
+  supabase: import("@supabase/supabase-js").SupabaseClient;
+};
 
-async function getAdminClient(context: ServerCtx) {
+function getAdminClient(context: ServerCtx) {
   const email = (context.claims?.email ?? "") as string;
   if (!isAdminEmail(email)) {
     throw new Error("Forbidden: not an admin");
   }
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  return supabaseAdmin;
+  return context.supabase;
 }
 
 // ---------- Settings (singleton) ----------
@@ -20,7 +24,7 @@ export const updateSiteSettings = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { data: Record<string, any> }) => d)
   .handler(async ({ data, context }) => {
-    const admin = await getAdminClient(context as any);
+    const admin = getAdminClient(context as any);
     const { error } = await admin
       .from("site_settings")
       .upsert({ id: "global", data: data.data }, { onConflict: "id" });
@@ -43,7 +47,7 @@ export const upsertCollectionItem = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { table: Table; row: Record<string, any> }) => d)
   .handler(async ({ data, context }) => {
-    const admin = await getAdminClient(context as any);
+    const admin = getAdminClient(context as any);
     const { error, data: out } = await admin
       .from(data.table as any)
       .upsert(data.row, { onConflict: "id" })
@@ -57,7 +61,7 @@ export const deleteCollectionItem = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { table: Table; id: string }) => d)
   .handler(async ({ data, context }) => {
-    const admin = await getAdminClient(context as any);
+    const admin = getAdminClient(context as any);
     const { error } = await admin.from(data.table as any).delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -67,8 +71,7 @@ export const reorderCollection = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { table: Table; ids: string[] }) => d)
   .handler(async ({ data, context }) => {
-    const admin = await getAdminClient(context as any);
-    // Sequentially update each row's sort_order
+    const admin = getAdminClient(context as any);
     for (let i = 0; i < data.ids.length; i++) {
       const { error } = await admin
         .from(data.table as any)
@@ -89,7 +92,7 @@ export const uploadMedia = createServerFn({ method: "POST" })
     (d: { filename: string; contentType: string; base64: string; pathPrefix?: string }) => d,
   )
   .handler(async ({ data, context }) => {
-    const admin = await getAdminClient(context as any);
+    const admin = getAdminClient(context as any);
     const bytes = Uint8Array.from(atob(data.base64), (c) => c.charCodeAt(0));
     const safeName = data.filename.replace(/[^a-zA-Z0-9._-]/g, "_");
     const path = `${data.pathPrefix ?? "uploads"}/${Date.now()}-${safeName}`;

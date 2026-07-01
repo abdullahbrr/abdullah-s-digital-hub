@@ -1,7 +1,7 @@
-// Public media proxy: streams private bucket files using service role.
+// Public media proxy: streams files from the public "media" bucket.
 // Aggressive caching since uploaded filenames include a timestamp.
 import { createFileRoute } from "@tanstack/react-router";
-import type {} from "@tanstack/react-start";
+import { createClient } from "@supabase/supabase-js";
 
 export const Route = createFileRoute("/api/public/media/$")({
   server: {
@@ -9,8 +9,12 @@ export const Route = createFileRoute("/api/public/media/$")({
       GET: async ({ params }) => {
         const splat = (params as { _splat?: string })._splat ?? "";
         if (!splat) return new Response("Not found", { status: 404 });
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { data, error } = await supabaseAdmin.storage.from("media").download(splat);
+        const supabase = createClient(
+          process.env.SUPABASE_URL!,
+          process.env.SUPABASE_PUBLISHABLE_KEY!,
+          { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
+        );
+        const { data, error } = await supabase.storage.from("media").download(splat);
         if (error || !data) return new Response("Not found", { status: 404 });
 
         const buf = await data.arrayBuffer();
