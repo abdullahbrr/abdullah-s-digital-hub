@@ -7,7 +7,10 @@ import type { Database } from "@/integrations/supabase/types";
 export type SiteContent = Awaited<ReturnType<typeof loadSiteContent>>;
 
 function makeClient() {
-  const url = process.env.SUPABASE_URL!;
+  const projectId = process.env.SUPABASE_PROJECT_ID;
+  const url = projectId
+    ? `https://${projectId}.supabase.co`
+    : process.env.SUPABASE_URL!;
   const key = process.env.SUPABASE_PUBLISHABLE_KEY!;
   return createClient<Database>(url, key, {
     auth: { storage: undefined, persistSession: false, autoRefreshToken: false },

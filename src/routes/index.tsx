@@ -28,6 +28,9 @@ export const Route = createFileRoute("/")({
     ],
     links: [{ rel: "canonical", href: "/" }],
   }),
+  loader: async () => {
+    return getSiteContent();
+  },
   component: Home,
 });
 
@@ -56,13 +59,30 @@ function applyThemePreset(id?: string) {
 }
 
 function Home() {
+  const loaderData = Route.useLoaderData();
   const fetchContent = useServerFn(getSiteContent);
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ["site-content"],
     queryFn: () => fetchContent(),
+    initialData: loaderData,
+    staleTime: 30_000,
   });
 
   useEffect(() => { applyThemePreset(data?.settings?.theme?.preset); }, [data]);
+
+  if (isError) {
+    return (
+      <div className="grid min-h-dvh place-items-center bg-background px-4">
+        <div className="max-w-md text-center">
+          <p className="text-lg font-semibold text-foreground">Could not load portfolio</p>
+          <p className="mt-2 text-sm text-muted-foreground">{(error as Error)?.message ?? "Unknown error"}</p>
+          <button onClick={() => window.location.reload()} className="mt-4 rounded-full bg-gradient-brand px-5 py-2 text-sm font-semibold text-brand-foreground">
+            Try again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading || !data) {
     return <div className="grid min-h-dvh place-items-center bg-background text-muted-foreground">Loading…</div>;
@@ -76,7 +96,6 @@ function Home() {
 
   const quotes: Array<{ text: string; author?: string }> = Array.isArray(s.quotes) ? s.quotes : [];
   const story = s.story ?? {};
-  // Sprinkle a rotating quote band between major content blocks.
   const interludeAfter = new Set(["about", "experience", "publications"]);
 
   const d = data;
