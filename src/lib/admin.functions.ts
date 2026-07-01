@@ -46,7 +46,7 @@ export const upsertCollectionItem = createServerFn({ method: "POST" })
     const admin = await getAdminClient(context as any);
     const { error, data: out } = await admin
       .from(data.table as any)
-      .upsert(data.row)
+      .upsert(data.row, { onConflict: "id" })
       .select()
       .single();
     if (error) throw new Error(error.message);

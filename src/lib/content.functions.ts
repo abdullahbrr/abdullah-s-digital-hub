@@ -26,7 +26,7 @@ async function loadSiteContent() {
       supabase.from("awards").select("*").order("sort_order"),
       supabase.from("organizations").select("*").order("sort_order"),
       supabase.from("skill_groups").select("*").order("sort_order"),
-      supabase.from("writings" as any).select("*").order("sort_order"),
+      supabase.from("writings").select("*").order("sort_order"),
     ]);
 
   return {
@@ -38,7 +38,7 @@ async function loadSiteContent() {
     awards: awards.data ?? [],
     organizations: organizations.data ?? [],
     skillGroups: skills.data ?? [],
-    writings: (writings.data ?? []) as any[],
+    writings: writings.data ?? [],
   };
 }
 

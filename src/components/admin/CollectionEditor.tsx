@@ -1,6 +1,6 @@
 // Generic admin editor for any collection table (publications, projects,
 // experiences, educations, awards, organizations, skill_groups).
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -88,7 +88,11 @@ export function CollectionEditor({
   });
   const reorderMut = useMutation({
     mutationFn: (ids: string[]) => reorder({ data: { table, ids } }),
-    onError: (e) => toast("err", (e as Error).message),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", table] }),
+    onError: (e) => {
+      qc.invalidateQueries({ queryKey: ["admin", table] });
+      toast("err", (e as Error).message);
+    },
   });
 
   function onDragEnd(e: DragEndEvent) {
@@ -153,6 +157,10 @@ function SortableRow({
   const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.6 : 1 };
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState(row);
+
+  useEffect(() => {
+    if (!open) setDraft(row);
+  }, [row, open]);
 
   function commit() {
     onSave(draft);

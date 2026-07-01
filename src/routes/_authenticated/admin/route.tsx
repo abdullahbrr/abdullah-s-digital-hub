@@ -2,25 +2,7 @@
 // kicked to the public site (server fns also re-check).
 import { createFileRoute, Outlet, Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import {
-  Home,
-  User,
-  GraduationCap,
-  Briefcase,
-  Wrench,
-  FlaskConical,
-  BookOpen,
-  FolderKanban,
-  Award,
-  Users,
-  Image as ImageIcon,
-  Palette,
-  Layers,
-  LogOut,
-  ExternalLink,
-  Feather,
-  Quote,
-} from "lucide-react";
+import { Hop as Home, User, GraduationCap, Briefcase, Wrench, FlaskConical, BookOpen, FolderKanban, Award, Users, Image as ImageIcon, Palette, Layers, LogOut, ExternalLink, Feather, Quote } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ADMIN_EMAIL, isAdminEmail } from "@/lib/admin-config";
 
@@ -55,13 +37,18 @@ function AdminLayout() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      const e = data.user?.email ?? null;
-      setEmail(e);
-      if (!isAdminEmail(e)) {
-        navigate({ to: "/" });
-      }
-    });
+    supabase.auth
+      .getUser()
+      .then(({ data }) => {
+        const e = data.user?.email ?? null;
+        setEmail(e);
+        if (!isAdminEmail(e)) {
+          navigate({ to: "/" });
+        }
+      })
+      .catch(() => {
+        navigate({ to: "/auth" });
+      });
   }, [navigate]);
 
   async function signOut() {
