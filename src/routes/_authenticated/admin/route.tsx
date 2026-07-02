@@ -2,7 +2,7 @@
 // kicked to the public site (server fns also re-check).
 import { createFileRoute, Outlet, Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Hop as Home, User, GraduationCap, Briefcase, Wrench, FlaskConical, BookOpen, FolderKanban, Award, Users, Image as ImageIcon, Palette, Layers, LogOut, ExternalLink, Feather, Quote } from "lucide-react";
+import { Hop as Home, User, GraduationCap, Briefcase, Wrench, FlaskConical, BookOpen, FolderKanban, Award, Users, Image as ImageIcon, Palette, Layers, LogOut, ExternalLink, Feather, Quote, Newspaper } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ADMIN_EMAIL, isAdminEmail } from "@/lib/admin-config";
 
@@ -23,6 +23,8 @@ const NAV: NavItem[] = [
   { to: "/admin/publications", label: "Publications", icon: BookOpen },
   { to: "/admin/projects", label: "Projects", icon: FolderKanban },
   { to: "/admin/writings", label: "Writing", icon: Feather },
+  { to: "/admin/blog", label: "Blog", icon: Newspaper },
+
   { to: "/admin/awards", label: "Awards", icon: Award },
   { to: "/admin/organizations", label: "Organizations", icon: Users },
   { to: "/admin/media", label: "Media & CV", icon: ImageIcon },
