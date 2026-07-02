@@ -41,7 +41,11 @@ export function Nav({
               {item.label}
             </a>
           ))}
+          <a href="/blog" className="rounded-full px-3.5 py-2 text-sm font-medium text-muted-foreground transition hover:bg-accent hover:text-foreground">
+            Blog
+          </a>
         </nav>
+
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
