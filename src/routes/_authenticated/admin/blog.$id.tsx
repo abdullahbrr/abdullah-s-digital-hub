@@ -94,13 +94,12 @@ function BlogEditor() {
     <>
       <PageHeader
         title={draft.title || "Untitled"}
-        description={
-          <span className="inline-flex items-center gap-2">
-            <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${isPublished ? "bg-green-500/15 text-green-500" : "bg-amber-500/15 text-amber-500"}`}>{draft.status}</span>
-            <Link to="/admin/blog" className="text-xs text-muted-foreground hover:text-foreground">← All posts</Link>
-          </span>
-        }
+        description={`Status: ${draft.status}`}
       />
+      <div className="-mt-4 mb-4">
+        <Link to="/admin/blog" className="text-xs text-muted-foreground hover:text-foreground">← All posts</Link>
+      </div>
+
 
       <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
         <div className="space-y-5">
