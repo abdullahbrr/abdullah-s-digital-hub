@@ -23,6 +23,8 @@ const NAV: NavItem[] = [
   { to: "/admin/publications", label: "Publications", icon: BookOpen },
   { to: "/admin/projects", label: "Projects", icon: FolderKanban },
   { to: "/admin/writings", label: "Writing", icon: Feather },
+  { to: "/admin/blog", label: "Blog", icon: Newspaper },
+
   { to: "/admin/awards", label: "Awards", icon: Award },
   { to: "/admin/organizations", label: "Organizations", icon: Users },
   { to: "/admin/media", label: "Media & CV", icon: ImageIcon },
