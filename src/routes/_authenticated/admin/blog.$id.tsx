@@ -32,7 +32,7 @@ function fileToBase64(file: File): Promise<string> {
 function BlogEditor() {
   const { id } = Route.useParams();
   const qc = useQueryClient();
-  const navigate = useNavigate();
+  
   const { toast, view } = useToast();
   const upsert = useServerFn(upsertCollectionItem);
   const upload = useServerFn(uploadMedia);
