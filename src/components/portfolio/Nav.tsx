@@ -66,7 +66,11 @@ export function Nav({
                 {item.label}
               </a>
             ))}
+            <a href="/blog" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground">
+              Blog
+            </a>
           </nav>
+
         </div>
       )}
     </header>
