@@ -75,9 +75,14 @@ function BlogEditor() {
     if (!draft) return;
     const row: any = {
       ...draft,
-      slug: draft.slug?.trim() || slugify(draft.title || "") || `post-${Date.now()}`,
+      title: (draft.title || "").trim() || "Untitled post",
+      slug: (draft.slug || "").trim() || slugify(draft.title || "") || `post-${Date.now()}`,
+      body: draft.body ?? "",
+      tags: Array.isArray(draft.tags) ? draft.tags : [],
       reading_minutes: estimateReading(draft.body || ""),
     };
+    // Timestamp cols reject empty strings — coerce to null.
+    if (!row.published_at || String(row.published_at).trim() === "") row.published_at = null;
     if (publish) {
       row.status = "published";
       row.published_at = row.published_at || new Date().toISOString();
@@ -85,6 +90,7 @@ function BlogEditor() {
     saveMut.mutate(row);
     if (publish) setDraft((d) => (d ? { ...d, ...row } : d));
   }
+
 
   if (isLoading || !draft) return <p className="text-sm text-muted-foreground">Loading…</p>;
 
