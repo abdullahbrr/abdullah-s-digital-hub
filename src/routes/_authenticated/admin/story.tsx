@@ -3,9 +3,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { updateSiteSettings } from "@/lib/admin.functions";
+import { updateSiteSettings, uploadMedia } from "@/lib/admin.functions";
 import { Button, Card, Field, PageHeader, TextArea, TextInput, useToast } from "@/components/admin/ui";
 
 export const Route = createFileRoute("/_authenticated/admin/story")({
@@ -13,7 +13,8 @@ export const Route = createFileRoute("/_authenticated/admin/story")({
 });
 
 type Quote = { text: string; author?: string };
-type Chapter = { year: string; title: string; body: string };
+type Chapter = { year: string; title: string; body: string; image_url?: string };
+
 
 function StoryAdmin() {
   const qc = useQueryClient();
