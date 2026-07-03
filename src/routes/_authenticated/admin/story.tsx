@@ -3,9 +3,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { updateSiteSettings } from "@/lib/admin.functions";
+import { updateSiteSettings, uploadMedia } from "@/lib/admin.functions";
 import { Button, Card, Field, PageHeader, TextArea, TextInput, useToast } from "@/components/admin/ui";
 
 export const Route = createFileRoute("/_authenticated/admin/story")({
@@ -13,7 +13,8 @@ export const Route = createFileRoute("/_authenticated/admin/story")({
 });
 
 type Quote = { text: string; author?: string };
-type Chapter = { year: string; title: string; body: string };
+type Chapter = { year: string; title: string; body: string; image_url?: string };
+
 
 function StoryAdmin() {
   const qc = useQueryClient();
@@ -97,29 +98,70 @@ function StoryAdmin() {
               <Plus className="h-4 w-4" /> Add chapter
             </Button>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-5">
             {chapters.map((c, i) => (
-              <div key={i} className="grid gap-2 sm:grid-cols-[120px_1fr_auto]">
-                <TextInput placeholder="Year"
-                  value={c.year}
-                  onChange={(e) => { const next = [...chapters]; next[i] = { ...c, year: e.target.value }; setStory({ chapters: next }); }} />
-                <div className="grid gap-2">
-                  <TextInput placeholder="Chapter title"
-                    value={c.title}
-                    onChange={(e) => { const next = [...chapters]; next[i] = { ...c, title: e.target.value }; setStory({ chapters: next }); }} />
-                  <TextArea placeholder="Chapter body"
-                    value={c.body}
-                    onChange={(e) => { const next = [...chapters]; next[i] = { ...c, body: e.target.value }; setStory({ chapters: next }); }} />
+              <div key={i} className="rounded-xl border border-border bg-surface p-4">
+                <div className="grid gap-2 sm:grid-cols-[120px_1fr_auto]">
+                  <TextInput placeholder="Year"
+                    value={c.year}
+                    onChange={(e) => { const next = [...chapters]; next[i] = { ...c, year: e.target.value }; setStory({ chapters: next }); }} />
+                  <div className="grid gap-2">
+                    <TextInput placeholder="Chapter title"
+                      value={c.title}
+                      onChange={(e) => { const next = [...chapters]; next[i] = { ...c, title: e.target.value }; setStory({ chapters: next }); }} />
+                    <TextArea placeholder="Chapter body"
+                      value={c.body}
+                      onChange={(e) => { const next = [...chapters]; next[i] = { ...c, body: e.target.value }; setStory({ chapters: next }); }} />
+                  </div>
+                  <Button variant="danger" onClick={() => setStory({ chapters: chapters.filter((_, j) => j !== i) })}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
-                <Button variant="danger" onClick={() => setStory({ chapters: chapters.filter((_, j) => j !== i) })}>
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <ChapterImage
+                  value={c.image_url ?? ""}
+                  onChange={(v) => { const next = [...chapters]; next[i] = { ...c, image_url: v }; setStory({ chapters: next }); }}
+                />
               </div>
             ))}
           </div>
+
         </Card>
       </div>
       {view}
     </>
   );
 }
+
+function ChapterImage({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const upload = useServerFn(uploadMedia);
+  const { toast } = useToast();
+  async function pick(file: File) {
+    try {
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve((r.result as string).split(",")[1] ?? "");
+        r.onerror = () => reject(r.error);
+        r.readAsDataURL(file);
+      });
+      const res = await upload({ data: { filename: file.name, contentType: file.type, base64, pathPrefix: "story" } });
+      onChange(res.url);
+    } catch (e) {
+      toast("err", (e as Error).message);
+    }
+  }
+  return (
+    <div className="mt-3 space-y-2">
+      {value && <img src={value} alt="" className="aspect-[16/9] w-full max-w-sm rounded-lg object-cover" />}
+      <div className="flex flex-wrap items-center gap-2">
+        <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-gradient-brand px-3 py-1.5 text-xs font-semibold text-brand-foreground">
+          <Upload className="h-3 w-3" /> Chapter image
+          <input type="file" accept="image/*" className="hidden"
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) pick(f); e.currentTarget.value = ""; }} />
+        </label>
+        <TextInput value={value} placeholder="or paste image URL" onChange={(e) => onChange(e.target.value)} />
+        {value && <Button variant="ghost" onClick={() => onChange("")}>Remove</Button>}
+      </div>
+    </div>
+  );
+}
+

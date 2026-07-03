@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as AwardsIdRouteImport } from './routes/awards.$id'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminWritingsRouteImport } from './routes/_authenticated/admin/writings'
@@ -63,6 +64,11 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => BlogRoute,
+} as any)
+const AwardsIdRoute = AwardsIdRouteImport.update({
+  id: '/awards/$id',
+  path: '/awards/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
   id: '/admin',
@@ -179,6 +185,7 @@ export interface FileRoutesByFullPath {
   '/blog': typeof BlogRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/awards/$id': typeof AwardsIdRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/admin/appearance': typeof AuthenticatedAdminAppearanceRoute
   '/admin/awards': typeof AuthenticatedAdminAwardsRoute
@@ -204,6 +211,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/blog': typeof BlogRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/awards/$id': typeof AwardsIdRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/admin/appearance': typeof AuthenticatedAdminAppearanceRoute
   '/admin/awards': typeof AuthenticatedAdminAwardsRoute
@@ -232,6 +240,7 @@ export interface FileRoutesById {
   '/blog': typeof BlogRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/awards/$id': typeof AwardsIdRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/_authenticated/admin/appearance': typeof AuthenticatedAdminAppearanceRoute
   '/_authenticated/admin/awards': typeof AuthenticatedAdminAwardsRoute
@@ -260,6 +269,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/sitemap.xml'
     | '/admin'
+    | '/awards/$id'
     | '/blog/$slug'
     | '/admin/appearance'
     | '/admin/awards'
@@ -285,6 +295,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/blog'
     | '/sitemap.xml'
+    | '/awards/$id'
     | '/blog/$slug'
     | '/admin/appearance'
     | '/admin/awards'
@@ -312,6 +323,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/sitemap.xml'
     | '/_authenticated/admin'
+    | '/awards/$id'
     | '/blog/$slug'
     | '/_authenticated/admin/appearance'
     | '/_authenticated/admin/awards'
@@ -339,6 +351,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   BlogRoute: typeof BlogRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  AwardsIdRoute: typeof AwardsIdRoute
   ApiPublicMediaSplatRoute: typeof ApiPublicMediaSplatRoute
 }
 
@@ -385,6 +398,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/blog/$slug'
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof BlogRoute
+    }
+    '/awards/$id': {
+      id: '/awards/$id'
+      path: '/awards/$id'
+      fullPath: '/awards/$id'
+      preLoaderRoute: typeof AwardsIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
@@ -607,18 +627,9 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   BlogRoute: BlogRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  AwardsIdRoute: AwardsIdRoute,
   ApiPublicMediaSplatRoute: ApiPublicMediaSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

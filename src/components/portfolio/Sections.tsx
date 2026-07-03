@@ -1,7 +1,9 @@
 import {
-  Award, BookOpen, Briefcase, ExternalLink, FlaskConical, GraduationCap, Mail, MapPin, Phone, Users, Wrench, CalendarCheck, Linkedin, Github, Sparkles,
+  Award, BookOpen, Briefcase, ExternalLink, FlaskConical, GraduationCap, Mail, MapPin, Phone, Users, Wrench, CalendarCheck, Linkedin, Github, Sparkles, ArrowUpRight,
 } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { Section } from "./Section";
+
 
 export function About({ profile, about }: { profile: Record<string, any>; about: Record<string, any> }) {
   const paragraphs: string[] = about?.paragraphs ?? [];
@@ -190,20 +192,39 @@ export function Projects({ rows }: { rows: any[] }) {
 export function Awards({ rows }: { rows: any[] }) {
   return (
     <Section id="awards" eyebrow="Awards" title="Recognition."
-      description="National innovation challenges and fellowships won across renewable energy and entrepreneurship.">
+      description="Each award has its own page — click any card to read the story and see photos.">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {rows.map((a) => (
-          <article key={a.id} className="surface-card rounded-2xl p-6">
-            <span className="grid h-11 w-11 place-items-center rounded-xl bg-gradient-brand text-brand-foreground"><Award className="h-5 w-5" /></span>
-            <h3 className="mt-4 font-display text-base font-bold text-foreground">{a.title}</h3>
-            {a.org && <p className="mt-1 text-sm text-muted-foreground">{a.org}</p>}
-            {a.prize && <p className="mt-3 inline-flex rounded-full border border-border bg-surface px-3 py-1 text-xs font-semibold text-gradient-brand">{a.prize}</p>}
-          </article>
+          <Link
+            key={a.id}
+            to="/awards/$id"
+            params={{ id: a.id }}
+            className="surface-card group relative flex h-full flex-col overflow-hidden rounded-2xl transition hover:-translate-y-1 hover:border-brand/50"
+          >
+            {a.image_url ? (
+              <img src={a.image_url} alt="" loading="lazy" className="aspect-[16/9] w-full object-cover" />
+            ) : (
+              <div className="grid aspect-[16/9] w-full place-items-center bg-gradient-brand/15">
+                <Award className="h-10 w-10 text-brand" />
+              </div>
+            )}
+            <div className="flex flex-1 flex-col p-6">
+              <h3 className="font-display text-base font-bold text-foreground group-hover:text-gradient-brand">{a.title}</h3>
+              {a.org && <p className="mt-1 text-sm text-muted-foreground">{a.org}</p>}
+              <div className="mt-3 flex items-center justify-between gap-2">
+                {a.prize && <span className="inline-flex rounded-full border border-border bg-surface px-3 py-1 text-xs font-semibold text-gradient-brand">{a.prize}</span>}
+                <span className="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground group-hover:text-gradient-brand">
+                  Read <ArrowUpRight className="h-3 w-3" />
+                </span>
+              </div>
+            </div>
+          </Link>
         ))}
       </div>
     </Section>
   );
 }
+
 
 export function Organizations({ rows }: { rows: any[] }) {
   return (

@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,12 +10,14 @@ export const Route = createFileRoute("/_authenticated/admin/blog")({
   component: BlogAdmin,
 });
 
+
 function slugify(s: string) {
   return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || `post-${Date.now()}`;
 }
 
 function BlogAdmin() {
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const { toast, view } = useToast();
   const upsert = useServerFn(upsertCollectionItem);
   const del = useServerFn(deleteCollectionItem);
@@ -34,23 +36,28 @@ function BlogAdmin() {
 
   const createMut = useMutation({
     mutationFn: async () => {
-      const title = "Untitled post";
       return upsert({
         data: {
           table: "blog_posts",
           row: {
-            title,
+            title: "Untitled post",
             slug: `draft-${Date.now()}`,
             status: "draft",
             body: "",
             tags: [],
+            author_name: "Abdullah Al Mamun",
           },
         },
       });
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin", "blog_posts"] }); toast("ok", "Draft created"); },
+    onSuccess: (row: any) => {
+      qc.invalidateQueries({ queryKey: ["admin", "blog_posts"] });
+      toast("ok", "Draft created");
+      if (row?.id) navigate({ to: "/admin/blog/$id", params: { id: row.id } });
+    },
     onError: (e) => toast("err", (e as Error).message),
   });
+
 
   const delMut = useMutation({
     mutationFn: (id: string) => del({ data: { table: "blog_posts", id } }),
