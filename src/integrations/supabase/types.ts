@@ -17,7 +17,10 @@ export type Database = {
       awards: {
         Row: {
           created_at: string
+          date: string | null
+          description: string | null
           id: string
+          image_url: string | null
           org: string
           prize: string
           sort_order: number
@@ -26,7 +29,10 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          date?: string | null
+          description?: string | null
           id?: string
+          image_url?: string | null
           org?: string
           prize?: string
           sort_order?: number
@@ -35,7 +41,10 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          date?: string | null
+          description?: string | null
           id?: string
+          image_url?: string | null
           org?: string
           prize?: string
           sort_order?: number

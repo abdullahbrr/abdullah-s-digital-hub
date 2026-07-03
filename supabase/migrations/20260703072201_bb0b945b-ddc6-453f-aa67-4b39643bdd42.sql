@@ -1,0 +1,4 @@
+ALTER TABLE public.awards
+  ADD COLUMN IF NOT EXISTS image_url TEXT,
+  ADD COLUMN IF NOT EXISTS description TEXT,
+  ADD COLUMN IF NOT EXISTS date TEXT;

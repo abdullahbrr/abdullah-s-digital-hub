@@ -19,7 +19,7 @@ function makeClient() {
 
 async function loadSiteContent() {
   const supabase = makeClient();
-  const [settings, publications, projects, experiences, educations, awards, organizations, skills, writings] =
+  const [settings, publications, projects, experiences, educations, awards, organizations, skills, writings, posts] =
     await Promise.all([
       supabase.from("site_settings").select("data").eq("id", "global").maybeSingle(),
       supabase.from("publications").select("*").order("sort_order"),
@@ -30,6 +30,12 @@ async function loadSiteContent() {
       supabase.from("organizations").select("*").order("sort_order"),
       supabase.from("skill_groups").select("*").order("sort_order"),
       supabase.from("writings").select("*").order("sort_order"),
+      supabase
+        .from("blog_posts")
+        .select("id,title,slug,excerpt,cover_url,tags,published_at,reading_minutes,author_name")
+        .eq("status", "published")
+        .order("published_at", { ascending: false })
+        .limit(6),
     ]);
 
   return {
@@ -42,8 +48,10 @@ async function loadSiteContent() {
     organizations: organizations.data ?? [],
     skillGroups: skills.data ?? [],
     writings: writings.data ?? [],
+    posts: posts.data ?? [],
   };
 }
+
 
 export const getSiteContent = createServerFn({ method: "GET" }).handler(async () => {
   return loadSiteContent();
