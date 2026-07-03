@@ -97,26 +97,33 @@ function StoryAdmin() {
               <Plus className="h-4 w-4" /> Add chapter
             </Button>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-5">
             {chapters.map((c, i) => (
-              <div key={i} className="grid gap-2 sm:grid-cols-[120px_1fr_auto]">
-                <TextInput placeholder="Year"
-                  value={c.year}
-                  onChange={(e) => { const next = [...chapters]; next[i] = { ...c, year: e.target.value }; setStory({ chapters: next }); }} />
-                <div className="grid gap-2">
-                  <TextInput placeholder="Chapter title"
-                    value={c.title}
-                    onChange={(e) => { const next = [...chapters]; next[i] = { ...c, title: e.target.value }; setStory({ chapters: next }); }} />
-                  <TextArea placeholder="Chapter body"
-                    value={c.body}
-                    onChange={(e) => { const next = [...chapters]; next[i] = { ...c, body: e.target.value }; setStory({ chapters: next }); }} />
+              <div key={i} className="rounded-xl border border-border bg-surface p-4">
+                <div className="grid gap-2 sm:grid-cols-[120px_1fr_auto]">
+                  <TextInput placeholder="Year"
+                    value={c.year}
+                    onChange={(e) => { const next = [...chapters]; next[i] = { ...c, year: e.target.value }; setStory({ chapters: next }); }} />
+                  <div className="grid gap-2">
+                    <TextInput placeholder="Chapter title"
+                      value={c.title}
+                      onChange={(e) => { const next = [...chapters]; next[i] = { ...c, title: e.target.value }; setStory({ chapters: next }); }} />
+                    <TextArea placeholder="Chapter body"
+                      value={c.body}
+                      onChange={(e) => { const next = [...chapters]; next[i] = { ...c, body: e.target.value }; setStory({ chapters: next }); }} />
+                  </div>
+                  <Button variant="danger" onClick={() => setStory({ chapters: chapters.filter((_, j) => j !== i) })}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
-                <Button variant="danger" onClick={() => setStory({ chapters: chapters.filter((_, j) => j !== i) })}>
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <ChapterImage
+                  value={c.image_url ?? ""}
+                  onChange={(v) => { const next = [...chapters]; next[i] = { ...c, image_url: v }; setStory({ chapters: next }); }}
+                />
               </div>
             ))}
           </div>
+
         </Card>
       </div>
       {view}
