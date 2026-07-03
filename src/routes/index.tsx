@@ -8,7 +8,7 @@ import { Hero } from "@/components/portfolio/Hero";
 import {
   About, Awards, Contact, Education, Experience, Footer, Organizations, Projects, Publications, Research, Skills,
 } from "@/components/portfolio/Sections";
-import { QuoteBand, StoryTimeline, Writings, Reveal } from "@/components/portfolio/Interactive";
+import { QuoteBand, StoryTimeline, BlogPreview, Reveal } from "@/components/portfolio/Interactive";
 
 const SITE_TITLE = "Abdullah Al Mamun — Engineer, Researcher & Writer";
 const SITE_DESC = "Portfolio of Abdullah Al Mamun: B.Sc. EEE engineer building smart-metering systems, advancing photovoltaic research, writing essays, and shipping award-winning ventures from Bangladesh.";
@@ -109,7 +109,7 @@ function Home() {
       case "research":      return <Reveal key={id}><Research research={s.research ?? {}} /></Reveal>;
       case "publications":  return <Reveal key={id}><Publications rows={d.publications} /></Reveal>;
       case "projects":      return <Reveal key={id}><Projects rows={d.projects} /></Reveal>;
-      case "writings":      return <Writings key={id} rows={d.writings} />;
+      case "writings":      return <Reveal key={id}><BlogPreview posts={(d as any).posts ?? []} /></Reveal>;
       case "awards":        return <Reveal key={id}><Awards rows={d.awards} /></Reveal>;
       case "organizations": return <Reveal key={id}><Organizations rows={d.organizations} /></Reveal>;
       case "contact":       return <Reveal key={id}><Contact profile={profile} social={s.social ?? {}} cvUrl={s.media?.cvUrl} /></Reveal>;
