@@ -20,17 +20,19 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, Plus, Trash2 } from "lucide-react";
+import { GripVertical, Plus, Trash2, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   upsertCollectionItem,
   deleteCollectionItem,
   reorderCollection,
+  uploadMedia,
 } from "@/lib/admin.functions";
 import { Button, Card, Field, TextArea, TextInput, useToast } from "./ui";
 
-type FieldKind = "text" | "textarea" | "tags";
+type FieldKind = "text" | "textarea" | "tags" | "image";
 export type FieldDef = { name: string; label: string; kind: FieldKind; placeholder?: string };
+
 
 type Table =
   | "publications"
@@ -212,6 +214,11 @@ function SortableRow({
                     })
                   }
                 />
+              ) : f.kind === "image" ? (
+                <ImageField
+                  value={draft[f.name] ?? ""}
+                  onChange={(v) => setDraft({ ...draft, [f.name]: v })}
+                />
               ) : (
                 <TextInput
                   value={draft[f.name] ?? ""}
@@ -230,3 +237,41 @@ function SortableRow({
     </div>
   );
 }
+
+function ImageField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const upload = useServerFn(uploadMedia);
+  const { toast } = useToast();
+  async function pick(file: File) {
+    try {
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve((r.result as string).split(",")[1] ?? "");
+        r.onerror = () => reject(r.error);
+        r.readAsDataURL(file);
+      });
+      const res = await upload({ data: { filename: file.name, contentType: file.type, base64, pathPrefix: "collection" } });
+      onChange(res.url);
+    } catch (e) {
+      toast("err", (e as Error).message);
+    }
+  }
+  return (
+    <div className="space-y-2">
+      {value && <img src={value} alt="" className="aspect-[16/9] w-full max-w-sm rounded-lg object-cover" />}
+      <div className="flex flex-wrap items-center gap-2">
+        <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-gradient-brand px-3 py-1.5 text-xs font-semibold text-brand-foreground">
+          <Upload className="h-3 w-3" /> Upload image
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) pick(f); e.currentTarget.value = ""; }}
+          />
+        </label>
+        <TextInput value={value} placeholder="or paste image URL" onChange={(e) => onChange(e.target.value)} />
+        {value && <Button variant="ghost" onClick={() => onChange("")}>Remove</Button>}
+      </div>
+    </div>
+  );
+}
+
