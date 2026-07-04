@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { listPublishedPosts } from "@/lib/blog.functions";
+import { MediaImage } from "@/components/MediaImage";
 
 const postsQuery = queryOptions({
   queryKey: ["blog", "list"],
@@ -61,7 +62,7 @@ function BlogList() {
                   className="group grid gap-5 rounded-2xl border border-border bg-card p-5 transition hover:border-brand/40 hover:shadow-lg sm:grid-cols-[220px_1fr] sm:p-6"
                 >
                   {p.cover_url ? (
-                    <img
+                    <MediaImage
                       src={p.cover_url}
                       alt=""
                       loading="lazy"

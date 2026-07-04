@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { Quote, ArrowUpRight, Sparkles } from "lucide-react";
 import { Section } from "./Section";
+import { MediaImage } from "@/components/MediaImage";
 
 /** Wrap any block to fade/slide it in on scroll. */
 export function Reveal({ children, delay = 0, className = "" }: { children: ReactNode; delay?: number; className?: string }) {
@@ -155,7 +156,7 @@ export function StoryTimeline({
                   <span aria-hidden className="absolute left-2.5 top-6 hidden h-3 w-3 -translate-x-1/2 rounded-full border-2 border-background bg-gradient-brand sm:block md:left-1/2" />
                   <div className="surface-card group relative overflow-hidden rounded-2xl transition hover:-translate-y-1 hover:border-brand/50">
                     {c.image_url && (
-                      <img
+                      <MediaImage
                         src={c.image_url}
                         alt=""
                         loading="lazy"
@@ -200,7 +201,7 @@ export function BlogPreview({ posts }: { posts: any[] }) {
               className="surface-card group relative flex h-full flex-col overflow-hidden rounded-2xl transition hover:-translate-y-1 hover:border-brand/50"
             >
               {p.cover_url ? (
-                <img src={p.cover_url} alt="" loading="lazy" className="aspect-[16/9] w-full object-cover" />
+                <MediaImage src={p.cover_url} alt="" loading="lazy" className="aspect-[16/9] w-full object-cover" />
               ) : (
                 <div className="aspect-[16/9] w-full bg-gradient-brand/15" />
               )}

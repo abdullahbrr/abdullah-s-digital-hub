@@ -22,6 +22,7 @@ function AuthPage() {
   const [email, setEmail] = useState(ADMIN_EMAIL);
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   // If already signed in, bounce
@@ -34,6 +35,7 @@ function AuthPage() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setNotice(null);
     setBusy(true);
     try {
       if (mode === "signup") {
@@ -47,10 +49,32 @@ function AuthPage() {
         });
         if (error) throw error;
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+        if (error) throw new Error("That password is not accepted for this admin email. Reset the password below, then sign in again.");
       }
       navigate({ to: redirect });
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function sendReset() {
+    setError(null);
+    setNotice(null);
+    const target = email.trim();
+    if (!target) {
+      setError("Enter the admin email first.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(target, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      setNotice("Password reset email sent. Open the email link, set the new password, then return here.");
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -109,6 +133,11 @@ function AuthPage() {
                 {error}
               </p>
             )}
+            {notice && (
+              <p className="rounded-lg border border-brand/30 bg-brand/10 px-3 py-2 text-sm text-foreground">
+                {notice}
+              </p>
+            )}
 
             <button
               type="submit"
@@ -126,6 +155,16 @@ function AuthPage() {
           >
             {mode === "signin" ? "First time? Create the admin account →" : "Have an account? Sign in →"}
           </button>
+          {mode === "signin" && (
+            <button
+              type="button"
+              onClick={sendReset}
+              disabled={busy}
+              className="mt-3 w-full text-center text-xs font-semibold text-gradient-brand disabled:opacity-60"
+            >
+              Reset admin password
+            </button>
+          )}
         </div>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">

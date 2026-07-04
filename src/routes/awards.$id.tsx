@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { Award as AwardIcon, ArrowLeft } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
+import { MediaImage } from "@/components/MediaImage";
 
 const getAward = createServerFn({ method: "GET" })
   .inputValidator((d: { id: string }) => d)
@@ -84,7 +85,7 @@ function AwardPage() {
         </header>
 
         {a.image_url && (
-          <img src={a.image_url} alt={a.title} className="mt-8 aspect-[16/9] w-full rounded-2xl object-cover" />
+          <MediaImage src={a.image_url} alt={a.title} className="mt-8 aspect-[16/9] w-full rounded-2xl object-cover" />
         )}
 
         {a.description && (

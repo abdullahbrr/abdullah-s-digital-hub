@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { getPostBySlug } from "@/lib/blog.functions";
+import { MediaImage } from "@/components/MediaImage";
 
 const postQuery = (slug: string) =>
   queryOptions({
@@ -95,7 +96,7 @@ function BlogPost() {
         </header>
 
         {post.cover_url && (
-          <img
+          <MediaImage
             src={post.cover_url}
             alt=""
             className="mt-8 aspect-[16/9] w-full rounded-2xl object-cover"
