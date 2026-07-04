@@ -8,6 +8,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { updateSiteSettings, uploadMedia } from "@/lib/admin.functions";
 import { Button, Card, Field, PageHeader, TextInput, useToast } from "@/components/admin/ui";
 import { Upload } from "lucide-react";
+import { MediaImage } from "@/components/MediaImage";
+import { fileToBase64, prepareImageFile } from "@/lib/media-upload.client";
 
 export const Route = createFileRoute("/_authenticated/admin/media")({
   component: MediaAdmin,
@@ -39,8 +41,9 @@ function MediaAdmin() {
 
   async function handleFile(field: "portraitUrl" | "logoUrl" | "cvUrl", file: File) {
     try {
-      const base64 = await fileToBase64(file);
-      const result = await upload({ data: { filename: file.name, contentType: file.type, base64, pathPrefix: field } });
+      const readyFile = file.type === "application/pdf" ? file : await prepareImageFile(file);
+      const base64 = await fileToBase64(readyFile);
+      const result = await upload({ data: { filename: readyFile.name, contentType: readyFile.type, base64, pathPrefix: field } });
       const nextMedia = { ...media, [field]: result.url };
       const nextDraft = { ...draft, media: nextMedia };
       setDraft(nextDraft);
@@ -58,14 +61,14 @@ function MediaAdmin() {
       <div className="space-y-5">
         <Card>
           <h2 className="mb-3 font-display text-lg font-bold">Portrait</h2>
-          {media.portraitUrl && <img src={media.portraitUrl} alt="" className="mb-4 max-h-64 rounded-xl border border-border object-cover" />}
+          {media.portraitUrl && <MediaImage src={media.portraitUrl} alt="" className="mb-4 max-h-64 rounded-xl border border-border object-cover" />}
           <FileButton accept="image/*" onPick={(f) => handleFile("portraitUrl", f)} label="Upload portrait" />
           <Field label="Or paste URL"><TextInput value={media.portraitUrl ?? ""} onChange={(e) => setMedia({ portraitUrl: e.target.value })} onBlur={() => save.mutate(undefined)} /></Field>
         </Card>
 
         <Card>
           <h2 className="mb-3 font-display text-lg font-bold">Logo (optional)</h2>
-          {media.logoUrl && <img src={media.logoUrl} alt="" className="mb-4 max-h-16 rounded border border-border object-contain" />}
+          {media.logoUrl && <MediaImage src={media.logoUrl} alt="" className="mb-4 max-h-16 rounded border border-border object-contain" />}
           <FileButton accept="image/*" onPick={(f) => handleFile("logoUrl", f)} label="Upload logo" />
           <Field label="Or paste URL"><TextInput value={media.logoUrl ?? ""} onChange={(e) => setMedia({ logoUrl: e.target.value })} onBlur={() => save.mutate(undefined)} /></Field>
         </Card>
@@ -96,14 +99,3 @@ function FileButton({ accept, label, onPick }: { accept: string; label: string; 
   );
 }
 
-function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result as string;
-      resolve(result.split(",")[1] ?? "");
-    };
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
-  });
-}

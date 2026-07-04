@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { upsertCollectionItem, uploadMedia } from "@/lib/admin.functions";
 import { Button, Card, Field, PageHeader, TextArea, TextInput, useToast } from "@/components/admin/ui";
 import { Upload, Eye, Save, Send } from "lucide-react";
+import { MediaImage } from "@/components/MediaImage";
+import { fileToBase64, prepareImageFile } from "@/lib/media-upload.client";
 
 export const Route = createFileRoute("/_authenticated/admin/blog/$id")({
   component: BlogEditor,
@@ -18,15 +20,6 @@ function slugify(s: string) {
 function estimateReading(body: string) {
   const words = body.replace(/<[^>]+>/g, " ").split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.round(words / 200));
-}
-
-function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const r = new FileReader();
-    r.onload = () => resolve((r.result as string).split(",")[1] ?? "");
-    r.onerror = () => reject(r.error);
-    r.readAsDataURL(file);
-  });
 }
 
 function BlogEditor() {
@@ -65,8 +58,9 @@ function BlogEditor() {
 
   async function handleCover(file: File) {
     try {
-      const base64 = await fileToBase64(file);
-      const r = await upload({ data: { filename: file.name, contentType: file.type, base64, pathPrefix: "blog-covers" } });
+      const readyFile = await prepareImageFile(file);
+      const base64 = await fileToBase64(readyFile);
+      const r = await upload({ data: { filename: readyFile.name, contentType: readyFile.type, base64, pathPrefix: "blog-covers" } });
       set("cover_url", r.url);
     } catch (e) { toast("err", (e as Error).message); }
   }
@@ -163,7 +157,7 @@ function BlogEditor() {
 
           <Card>
             <h3 className="mb-3 font-display text-sm font-bold">Cover image</h3>
-            {draft.cover_url && <img src={draft.cover_url} alt="" className="mb-3 aspect-[16/9] w-full rounded-lg object-cover" />}
+            {draft.cover_url && <MediaImage src={draft.cover_url} alt="" className="mb-3 aspect-[16/9] w-full rounded-lg object-cover" />}
             <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-gradient-brand px-3 py-1.5 text-xs font-semibold text-brand-foreground">
               <Upload className="h-3 w-3" /> Upload cover
               <input

@@ -1,5 +1,6 @@
 import { Mail, ArrowRight, MapPin, Phone, Sparkles, CalendarCheck } from "lucide-react";
 import portraitAsset from "@/assets/mamun-portrait.png.asset.json";
+import { MediaImage } from "@/components/MediaImage";
 
 export function Hero({ profile, portraitUrl }: { profile: Record<string, any>; portraitUrl?: string }) {
   const roles: string[] = Array.isArray(profile.roles) ? profile.roles : [];
@@ -42,7 +43,7 @@ export function Hero({ profile, portraitUrl }: { profile: Record<string, any>; p
         <div className="relative mx-auto w-full max-w-md lg:max-w-none">
           <div className="absolute -inset-6 -z-10 rounded-[2.5rem] bg-gradient-brand opacity-30 blur-3xl" />
           <div className="ring-glow animate-float overflow-hidden rounded-3xl border border-border bg-surface-elevated">
-            <img src={src} alt={`Portrait of ${profile.name ?? ""}`} width={900} height={1125} loading="eager" fetchPriority="high" className="h-full w-full object-cover" />
+            <MediaImage src={src} alt={`Portrait of ${profile.name ?? ""}`} width={900} height={1125} loading="eager" fetchPriority="high" className="h-full w-full object-cover" />
           </div>
         </div>
       </div>

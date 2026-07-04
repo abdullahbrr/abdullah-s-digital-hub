@@ -3,6 +3,7 @@ import {
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Section } from "./Section";
+import { MediaImage } from "@/components/MediaImage";
 
 
 export function About({ profile, about }: { profile: Record<string, any>; about: Record<string, any> }) {
@@ -202,7 +203,7 @@ export function Awards({ rows }: { rows: any[] }) {
             className="surface-card group relative flex h-full flex-col overflow-hidden rounded-2xl transition hover:-translate-y-1 hover:border-brand/50"
           >
             {a.image_url ? (
-              <img src={a.image_url} alt="" loading="lazy" className="aspect-[16/9] w-full object-cover" />
+              <MediaImage src={a.image_url} alt="" loading="lazy" className="aspect-[16/9] w-full object-cover" />
             ) : (
               <div className="grid aspect-[16/9] w-full place-items-center bg-gradient-brand/15">
                 <Award className="h-10 w-10 text-brand" />

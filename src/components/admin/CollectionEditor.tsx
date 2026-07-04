@@ -29,6 +29,8 @@ import {
   uploadMedia,
 } from "@/lib/admin.functions";
 import { Button, Card, Field, TextArea, TextInput, useToast } from "./ui";
+import { MediaImage } from "@/components/MediaImage";
+import { fileToBase64, prepareImageFile } from "@/lib/media-upload.client";
 
 type FieldKind = "text" | "textarea" | "tags" | "image";
 export type FieldDef = { name: string; label: string; kind: FieldKind; placeholder?: string };
@@ -243,13 +245,9 @@ function ImageField({ value, onChange }: { value: string; onChange: (v: string) 
   const { toast } = useToast();
   async function pick(file: File) {
     try {
-      const base64 = await new Promise<string>((resolve, reject) => {
-        const r = new FileReader();
-        r.onload = () => resolve((r.result as string).split(",")[1] ?? "");
-        r.onerror = () => reject(r.error);
-        r.readAsDataURL(file);
-      });
-      const res = await upload({ data: { filename: file.name, contentType: file.type, base64, pathPrefix: "collection" } });
+      const readyFile = await prepareImageFile(file);
+      const base64 = await fileToBase64(readyFile);
+      const res = await upload({ data: { filename: readyFile.name, contentType: readyFile.type, base64, pathPrefix: "collection" } });
       onChange(res.url);
     } catch (e) {
       toast("err", (e as Error).message);
@@ -257,7 +255,7 @@ function ImageField({ value, onChange }: { value: string; onChange: (v: string) 
   }
   return (
     <div className="space-y-2">
-      {value && <img src={value} alt="" className="aspect-[16/9] w-full max-w-sm rounded-lg object-cover" />}
+      {value && <MediaImage src={value} alt="" className="aspect-[16/9] w-full max-w-sm rounded-lg object-cover" />}
       <div className="flex flex-wrap items-center gap-2">
         <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-gradient-brand px-3 py-1.5 text-xs font-semibold text-brand-foreground">
           <Upload className="h-3 w-3" /> Upload image
