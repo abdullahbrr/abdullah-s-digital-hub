@@ -2,7 +2,7 @@
 // kicked to the public site (server fns also re-check).
 import { createFileRoute, Outlet, Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Hop as Home, User, GraduationCap, Briefcase, Wrench, FlaskConical, BookOpen, FolderKanban, Award, Users, Image as ImageIcon, Palette, Layers, LogOut, ExternalLink, Feather, Quote, Newspaper } from "lucide-react";
+import { Hop as Home, User, GraduationCap, Briefcase, Wrench, FlaskConical, BookOpen, FolderKanban, Award, Users, Image as ImageIcon, Palette, Layers, LogOut, ExternalLink, Quote, Newspaper } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ADMIN_EMAIL, isAdminEmail } from "@/lib/admin-config";
 
