@@ -37,7 +37,7 @@ export const Route = createFileRoute("/")({
 const SECTION_LABELS: Record<string, string> = {
   about: "About", education: "Education", experience: "Experience", skills: "Skills",
   research: "Research", publications: "Publications", projects: "Projects",
-  writings: "Writing", awards: "Awards", organizations: "Organizations", contact: "Contact",
+  writings: "Blog", awards: "Awards", organizations: "Organizations", contact: "Contact",
 };
 
 const THEME_PRESET_VARS: Record<string, { brand: string; brand2: string; brand3: string }> = {
