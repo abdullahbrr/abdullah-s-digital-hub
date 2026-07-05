@@ -57,6 +57,7 @@ export type Database = {
         Row: {
           author_name: string | null
           body: string
+          category: string | null
           cover_url: string | null
           created_at: string
           excerpt: string | null
@@ -74,6 +75,7 @@ export type Database = {
         Insert: {
           author_name?: string | null
           body?: string
+          category?: string | null
           cover_url?: string | null
           created_at?: string
           excerpt?: string | null
@@ -91,6 +93,7 @@ export type Database = {
         Update: {
           author_name?: string | null
           body?: string
+          category?: string | null
           cover_url?: string | null
           created_at?: string
           excerpt?: string | null
