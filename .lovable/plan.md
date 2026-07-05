@@ -1,41 +1,64 @@
+## Plan to fix the existing blog system completely
 
-Your request bundles ~5 major workstreams. I'll ship them in phases so nothing regresses. Confirm and I'll start Phase 1.
+### What I found
+- `blog_posts` has the needed core fields, but **there are no database grants** for `anon`, `authenticated`, or `service_role`, so public/admin reads and writes can fail through the Supabase Data API.
+- `blog_posts` has RLS policies, but the public read policy currently uses `roles: public` and mixes admin visibility into the public policy. I’ll make the rules explicit: public only sees published posts; admins can manage all posts.
+- `blog_posts` has **no unique constraint on slug** and no update trigger, so URL conflicts and stale update ordering can happen.
+- The admin editor currently saves through a generic upsert path and has weak publish validation, which can allow incomplete/blank posts to be saved or published.
+- The storage bucket is private and images are proxied through `/api/public/media/...`; storage object policies already include public read, but the app needs more reliable upload handling and clearer upload errors.
 
-## Phase 0 — Already done (this turn)
-- Enabled RLS on all content tables.
-- Added admin-only write policies keyed to `abdullah.brr12@gmail.com` (via `public.is_admin()`).
-- Added storage policies so the admin can upload/replace/delete files in the `media` bucket.
-- Public reads still work for the portfolio.
+### Database and storage repair
+- Add explicit `blog_posts` table grants:
+  - public visitors can read only published posts through RLS
+  - authenticated admins can create, edit, publish, draft, and delete
+  - service role keeps backend access
+- Replace/normalize blog RLS policies so:
+  - published posts are publicly readable
+  - drafts only appear for the admin in the dashboard
+  - only the configured admin email can insert/update/delete
+- Add a unique slug constraint/index to prevent duplicate blog URLs.
+- Add or attach the existing `updated_at` trigger to `blog_posts`.
+- Keep the existing `media` bucket and proxy route; verify storage read/write policies for the `media` bucket remain public-read/admin-write.
 
-Dashboard save + media upload should now work. Please try it once and confirm before I move on.
+### Code repair
+- Replace the blog editor’s generic save flow with blog-specific server functions for:
+  - create draft
+  - update draft
+  - publish/update published post
+  - unpublish to draft
+  - delete post
+- Validate before publishing:
+  - title required
+  - slug required and valid
+  - excerpt required
+  - body/rich text required
+  - cover image required
+  - author required
+  - status must be draft or published
+  - tags/category normalized before save
+- Add a `category` field to the blog editor if the database is missing it, and include it in admin/public displays.
+- Preserve rich text content by saving the editor body exactly as entered and rendering it consistently on post pages.
+- Improve featured image upload handling:
+  - convert HEIC/HEIF before upload
+  - return a stable `/api/public/media/...` URL
+  - immediately update the preview after upload
+  - show the actual Supabase/upload error when it fails
+- Update public blog queries so published posts appear immediately after publishing, and draft posts never appear publicly.
+- Invalidate the right admin and public blog query caches after every create/update/publish/delete action.
 
-## Phase 1 — Security & role hardening
-- Introduce proper `user_roles` table + `app_role` enum + `has_role()` security-definer function (per Lovable's role guidance).
-- Seed `abdullah.brr12@gmail.com` as `admin` on signup (trigger on `auth.users`, verified-email gated).
-- Replace hardcoded email check in `is_admin()` with `has_role(auth.uid(),'admin')`. Keep the email fallback only for the initial bootstrap.
-- Keep admin writes going through TanStack server functions with `requireSupabaseAuth` — this stack does NOT use Supabase Edge Functions for app-internal logic (that's the current template's rule). Service role stays server-only for privileged tasks (user management, cleanup).
-- Note: your prompt asked for Edge Functions specifically. On TanStack Start we use server functions instead — same security model, better DX. Tell me if you want Edge Functions anyway (e.g. for external webhooks).
+### Error handling and testing
+- Show actual server/database/storage errors in the admin toast instead of silent failures.
+- Add clear validation messages when publish requirements are missing.
+- Test the full workflow in the preview:
+  1. create a draft
+  2. enter title, slug, excerpt, author, category, tags, rich text, and cover image
+  3. save draft
+  4. publish
+  5. confirm it appears on `/blog`
+  6. open the public post page and confirm content + image render
+  7. edit/update published post
+  8. unpublish and confirm it disappears publicly but remains in admin
+  9. delete and confirm removal
 
-## Phase 2 — Blog CMS
-New tables: `blog_posts`, `blog_categories`, `blog_tags`, `blog_post_tags`, `blog_authors` (linked to `user_roles`).
-Post fields: title, slug, excerpt, cover_image, body (rich HTML), category_id, tags, author_id, status (`draft`/`scheduled`/`published`), published_at, seo_title, seo_description, og_image, reading_time.
-- Admin UI: list + editor with TipTap rich text editor, cover upload, category/tag pickers, SEO panel, draft/schedule/publish controls.
-- Public routes: `/blog`, `/blog/category/$slug`, `/blog/tag/$slug`, `/blog/$slug` with per-post `head()` meta + JSON-LD Article schema + og:image from cover.
-- Scheduled posts: `pg_cron` job flips `scheduled → published` when `published_at <= now()`.
-
-## Phase 3 — More image-friendly sections + story-driven redesign
-- New "Gallery" and "Moments" collections (image + caption + date), admin CRUD.
-- Add cover_image support to existing collections that don't have it (experiences, education, awards).
-- Rework homepage into a scroll-driven narrative: hero → origin story → chapters (education/experience) → featured writings → gallery strip → quotes interstitials → CTA. Preserve every existing section, just re-order and add motion (framer-motion fade/parallax).
-- Bengali + English quote blocks between sections, editable from the Story admin page you already have.
-
-## Phase 4 — Perf, responsiveness, polish
-- Image: lazy loading + `srcset` via a media proxy tweak, blur placeholders.
-- Route-level code splitting audit, prefetch on hover for internal links.
-- Mobile pass on nav, admin sidebar, blog editor.
-- Lighthouse pass + SEO scan.
-
-## What I need from you
-1. Confirm dashboard save/upload works after Phase 0.
-2. Confirm you're OK with TanStack server functions instead of Supabase Edge Functions (recommended), or say "use Edge Functions".
-3. Say "go" and I'll start Phase 1 → 4 in order (each phase is 1 message).
+### Important note
+I will repair the existing `blog_posts` system and current admin screens. I will not create a separate/new blog system.
