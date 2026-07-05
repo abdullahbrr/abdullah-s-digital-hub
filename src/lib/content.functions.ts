@@ -32,7 +32,7 @@ async function loadSiteContent() {
       supabase.from("writings").select("*").order("sort_order"),
       supabase
         .from("blog_posts")
-        .select("id,title,slug,excerpt,cover_url,tags,published_at,reading_minutes,author_name")
+        .select("id,title,slug,excerpt,cover_url,category,tags,published_at,reading_minutes,author_name")
         .eq("status", "published")
         .order("published_at", { ascending: false })
         .limit(6),

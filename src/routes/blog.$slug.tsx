@@ -68,13 +68,31 @@ export const Route = createFileRoute("/blog/$slug")({
 
 function renderBody(body: string): string {
   const trimmed = body.trim();
-  // If it looks like HTML already, pass through.
-  if (/<\/?[a-z][\s\S]*>/i.test(trimmed)) return trimmed;
+  // If it looks like HTML already, render a small safe subset.
+  if (/<\/?[a-z][\s\S]*>/i.test(trimmed)) return sanitizeHtml(trimmed);
   // Otherwise treat as plain paragraphs.
   return trimmed
     .split(/\n{2,}/)
-    .map((p) => `<p>${p.replace(/\n/g, "<br/>")}</p>`)
+    .map((p) => `<p>${escapeHtml(p).replace(/\n/g, "<br/>")}</p>`)
     .join("\n");
+}
+
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function sanitizeHtml(value: string) {
+  const allowed = "a|b|blockquote|br|code|em|h2|h3|h4|hr|i|img|li|ol|p|pre|strong|u|ul";
+  return value
+    .replace(/<\/?(?:script|style|iframe|object|embed|form|input|button|meta|link)[^>]*>/gi, "")
+    .replace(/\s+on[a-z]+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, "")
+    .replace(/\s+(href|src)\s*=\s*("|')\s*javascript:[\s\S]*?\2/gi, "")
+    .replace(new RegExp(`<\\/?(?!${allowed})([a-z][a-z0-9-]*)\\b[^>]*>`, "gi"), "");
 }
 
 function BlogPost() {
@@ -88,6 +106,7 @@ function BlogPost() {
         <header className="mt-8">
           <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
             {post.published_at && <time>{new Date(post.published_at).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}</time>}
+            {post.category && <span>· {post.category}</span>}
             {post.reading_minutes ? <span>· {post.reading_minutes} min read</span> : null}
             {post.author_name && <span>· {post.author_name}</span>}
           </div>

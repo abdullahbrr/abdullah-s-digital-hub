@@ -74,6 +74,7 @@ function BlogList() {
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                       {p.published_at && <time>{new Date(p.published_at).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}</time>}
+                      {p.category ? <span>· {p.category}</span> : null}
                       {p.reading_minutes ? <span>· {p.reading_minutes} min read</span> : null}
                     </div>
                     <h2 className="mt-2 font-display text-2xl font-bold leading-snug group-hover:text-gradient-brand">

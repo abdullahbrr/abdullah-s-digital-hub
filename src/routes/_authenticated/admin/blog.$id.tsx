@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
-import { upsertCollectionItem, uploadMedia } from "@/lib/admin.functions";
+import { uploadMedia } from "@/lib/admin.functions";
+import { publishBlogPost, saveBlogDraft, unpublishBlogPost } from "@/lib/blog.functions";
 import { Button, Card, Field, PageHeader, TextArea, TextInput, useToast } from "@/components/admin/ui";
 import { Upload, Eye, Save, Send } from "lucide-react";
 import { MediaImage } from "@/components/MediaImage";
@@ -27,7 +28,9 @@ function BlogEditor() {
   const qc = useQueryClient();
   
   const { toast, view } = useToast();
-  const upsert = useServerFn(upsertCollectionItem);
+  const saveDraft = useServerFn(saveBlogDraft);
+  const publishPost = useServerFn(publishBlogPost);
+  const unpublishPost = useServerFn(unpublishBlogPost);
   const upload = useServerFn(uploadMedia);
 
   const { data, isLoading } = useQuery({
@@ -43,11 +46,26 @@ function BlogEditor() {
   useEffect(() => { if (data) setDraft(data); }, [data]);
 
   const saveMut = useMutation({
-    mutationFn: (row: Record<string, any>) => upsert({ data: { table: "blog_posts", row } }),
-    onSuccess: () => {
+    mutationFn: ({ row, publish }: { row: Record<string, any>; publish: boolean }) =>
+      publish ? publishPost({ data: row as any }) : saveDraft({ data: row as any }),
+    onSuccess: (row) => {
+      setDraft(row as any);
       qc.invalidateQueries({ queryKey: ["admin", "blog_posts"] });
+      qc.invalidateQueries({ queryKey: ["admin", "blog_posts", id] });
       qc.invalidateQueries({ queryKey: ["blog"] });
       toast("ok", "Saved");
+    },
+    onError: (e) => toast("err", (e as Error).message),
+  });
+
+  const unpublishMut = useMutation({
+    mutationFn: () => unpublishPost({ data: { id } }),
+    onSuccess: (row) => {
+      setDraft(row as any);
+      qc.invalidateQueries({ queryKey: ["admin", "blog_posts"] });
+      qc.invalidateQueries({ queryKey: ["admin", "blog_posts", id] });
+      qc.invalidateQueries({ queryKey: ["blog"] });
+      toast("ok", "Moved to draft");
     },
     onError: (e) => toast("err", (e as Error).message),
   });
@@ -62,6 +80,7 @@ function BlogEditor() {
       const base64 = await fileToBase64(readyFile);
       const r = await upload({ data: { filename: readyFile.name, contentType: readyFile.type, base64, pathPrefix: "blog-covers" } });
       set("cover_url", r.url);
+      toast("ok", "Featured image uploaded");
     } catch (e) { toast("err", (e as Error).message); }
   }
 
@@ -71,7 +90,11 @@ function BlogEditor() {
       ...draft,
       title: (draft.title || "").trim() || "Untitled post",
       slug: (draft.slug || "").trim() || slugify(draft.title || "") || `post-${Date.now()}`,
+      excerpt: draft.excerpt ?? "",
+      cover_url: draft.cover_url ?? "",
       body: draft.body ?? "",
+      category: draft.category ?? "",
+      author_name: draft.author_name ?? "",
       tags: Array.isArray(draft.tags) ? draft.tags : [],
       reading_minutes: estimateReading(draft.body || ""),
     };
@@ -81,8 +104,7 @@ function BlogEditor() {
       row.status = "published";
       row.published_at = row.published_at || new Date().toISOString();
     }
-    saveMut.mutate(row);
-    if (publish) setDraft((d) => (d ? { ...d, ...row } : d));
+    saveMut.mutate({ row, publish: Boolean(publish) });
   }
 
 
@@ -148,7 +170,7 @@ function BlogEditor() {
                 </a>
               )}
               {isPublished && (
-                <Button variant="ghost" onClick={() => { set("status", "draft"); saveMut.mutate({ ...draft, status: "draft" }); }}>
+                <Button variant="ghost" onClick={() => unpublishMut.mutate()} loading={unpublishMut.isPending}>
                   Unpublish
                 </Button>
               )}
@@ -179,6 +201,9 @@ function BlogEditor() {
                 value={Array.isArray(draft.tags) ? draft.tags.join(", ") : ""}
                 onChange={(e) => set("tags", e.target.value.split(",").map((s) => s.trim()).filter(Boolean))}
               />
+            </Field>
+            <Field label="Category">
+              <TextInput value={draft.category ?? ""} onChange={(e) => set("category", e.target.value)} placeholder="News, Award, Story…" />
             </Field>
             <Field label="Author name">
               <TextInput value={draft.author_name ?? ""} onChange={(e) => set("author_name", e.target.value)} placeholder="Abdullah Al Mamun" />
