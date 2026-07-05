@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
-import { upsertCollectionItem, deleteCollectionItem } from "@/lib/admin.functions";
+import { createBlogDraft, deleteBlogPost } from "@/lib/blog.functions";
 import { Button, Card, PageHeader, useToast } from "@/components/admin/ui";
 import { Plus, Trash2, ExternalLink } from "lucide-react";
 
@@ -19,15 +19,15 @@ function BlogAdmin() {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const { toast, view } = useToast();
-  const upsert = useServerFn(upsertCollectionItem);
-  const del = useServerFn(deleteCollectionItem);
+  const createDraft = useServerFn(createBlogDraft);
+  const del = useServerFn(deleteBlogPost);
 
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ["admin", "blog_posts"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("blog_posts")
-        .select("id,title,slug,status,published_at,updated_at")
+        .select("id,title,slug,status,published_at,updated_at,cover_url,category")
         .order("updated_at", { ascending: false });
       if (error) throw error;
       return data;
@@ -35,21 +35,7 @@ function BlogAdmin() {
   });
 
   const createMut = useMutation({
-    mutationFn: async () => {
-      return upsert({
-        data: {
-          table: "blog_posts",
-          row: {
-            title: "Untitled post",
-            slug: `draft-${Date.now()}`,
-            status: "draft",
-            body: "",
-            tags: [],
-            author_name: "Abdullah Al Mamun",
-          },
-        },
-      });
-    },
+    mutationFn: async () => createDraft(),
     onSuccess: (row: any) => {
       qc.invalidateQueries({ queryKey: ["admin", "blog_posts"] });
       toast("ok", "Draft created");
@@ -60,8 +46,12 @@ function BlogAdmin() {
 
 
   const delMut = useMutation({
-    mutationFn: (id: string) => del({ data: { table: "blog_posts", id } }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin", "blog_posts"] }); toast("ok", "Deleted"); },
+    mutationFn: (id: string) => del({ data: { id } }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin", "blog_posts"] });
+      qc.invalidateQueries({ queryKey: ["blog"] });
+      toast("ok", "Deleted");
+    },
     onError: (e) => toast("err", (e as Error).message),
   });
 
@@ -90,6 +80,7 @@ function BlogAdmin() {
                   <p className="truncate text-sm font-semibold">{p.title}</p>
                 </div>
                 <p className="mt-0.5 truncate text-xs text-muted-foreground">/{p.slug}</p>
+                {p.category && <p className="mt-0.5 truncate text-xs text-muted-foreground">Category: {p.category}</p>}
               </div>
               {p.status === "published" && (
                 <a href={`/blog/${p.slug}`} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground" aria-label="View live">
