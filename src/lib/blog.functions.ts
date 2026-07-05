@@ -65,7 +65,7 @@ function estimateReading(body: string) {
 function normalizePost(input: z.infer<typeof blogInputSchema>, publish: boolean) {
   const title = input.title?.trim() || "Untitled post";
   const body = input.body ?? "";
-  const status = publish ? "published" : input.status === "published" ? "published" : "draft";
+  const status = publish ? "published" : "draft";
   const publishedAt =
     status === "published" ? input.published_at?.trim() || new Date().toISOString() : null;
 
