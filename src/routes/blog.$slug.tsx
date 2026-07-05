@@ -88,6 +88,7 @@ function BlogPost() {
         <header className="mt-8">
           <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
             {post.published_at && <time>{new Date(post.published_at).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}</time>}
+            {post.category && <span>· {post.category}</span>}
             {post.reading_minutes ? <span>· {post.reading_minutes} min read</span> : null}
             {post.author_name && <span>· {post.author_name}</span>}
           </div>
