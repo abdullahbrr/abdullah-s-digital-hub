@@ -87,32 +87,12 @@ function escapeHtml(value: string) {
 }
 
 function sanitizeHtml(value: string) {
-  if (typeof document === "undefined") return escapeHtml(value);
-  const template = document.createElement("template");
-  template.innerHTML = value;
-  const allowed = new Set(["A", "B", "BLOCKQUOTE", "BR", "CODE", "EM", "H2", "H3", "H4", "HR", "I", "IMG", "LI", "OL", "P", "PRE", "STRONG", "U", "UL"]);
-  const walker = document.createTreeWalker(template.content, NodeFilter.SHOW_ELEMENT);
-  const remove: Element[] = [];
-
-  while (walker.nextNode()) {
-    const el = walker.currentNode as Element;
-    if (!allowed.has(el.tagName)) {
-      remove.push(el);
-      continue;
-    }
-    for (const attr of Array.from(el.attributes)) {
-      const name = attr.name.toLowerCase();
-      const val = attr.value.trim().toLowerCase();
-      const keep =
-        (el.tagName === "A" && ["href", "title", "target", "rel"].includes(name) && !val.startsWith("javascript:")) ||
-        (el.tagName === "IMG" && ["src", "alt", "title", "loading"].includes(name) && !val.startsWith("javascript:"));
-      if (!keep) el.removeAttribute(attr.name);
-    }
-    if (el.tagName === "A") el.setAttribute("rel", "noopener noreferrer");
-    if (el.tagName === "IMG" && !el.getAttribute("loading")) el.setAttribute("loading", "lazy");
-  }
-  remove.forEach((el) => el.replaceWith(document.createTextNode(el.textContent ?? "")));
-  return template.innerHTML;
+  const allowed = "a|b|blockquote|br|code|em|h2|h3|h4|hr|i|img|li|ol|p|pre|strong|u|ul";
+  return value
+    .replace(/<\/?(?:script|style|iframe|object|embed|form|input|button|meta|link)[^>]*>/gi, "")
+    .replace(/\s+on[a-z]+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, "")
+    .replace(/\s+(href|src)\s*=\s*("|')\s*javascript:[\s\S]*?\2/gi, "")
+    .replace(new RegExp(`<\\/?(?!${allowed})([a-z][a-z0-9-]*)\\b[^>]*>`, "gi"), "");
 }
 
 function BlogPost() {
