@@ -68,13 +68,51 @@ export const Route = createFileRoute("/blog/$slug")({
 
 function renderBody(body: string): string {
   const trimmed = body.trim();
-  // If it looks like HTML already, pass through.
-  if (/<\/?[a-z][\s\S]*>/i.test(trimmed)) return trimmed;
+  // If it looks like HTML already, render a small safe subset.
+  if (/<\/?[a-z][\s\S]*>/i.test(trimmed)) return sanitizeHtml(trimmed);
   // Otherwise treat as plain paragraphs.
   return trimmed
     .split(/\n{2,}/)
-    .map((p) => `<p>${p.replace(/\n/g, "<br/>")}</p>`)
+    .map((p) => `<p>${escapeHtml(p).replace(/\n/g, "<br/>")}</p>`)
     .join("\n");
+}
+
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function sanitizeHtml(value: string) {
+  if (typeof document === "undefined") return escapeHtml(value);
+  const template = document.createElement("template");
+  template.innerHTML = value;
+  const allowed = new Set(["A", "B", "BLOCKQUOTE", "BR", "CODE", "EM", "H2", "H3", "H4", "HR", "I", "IMG", "LI", "OL", "P", "PRE", "STRONG", "U", "UL"]);
+  const walker = document.createTreeWalker(template.content, NodeFilter.SHOW_ELEMENT);
+  const remove: Element[] = [];
+
+  while (walker.nextNode()) {
+    const el = walker.currentNode as Element;
+    if (!allowed.has(el.tagName)) {
+      remove.push(el);
+      continue;
+    }
+    for (const attr of Array.from(el.attributes)) {
+      const name = attr.name.toLowerCase();
+      const val = attr.value.trim().toLowerCase();
+      const keep =
+        (el.tagName === "A" && ["href", "title", "target", "rel"].includes(name) && !val.startsWith("javascript:")) ||
+        (el.tagName === "IMG" && ["src", "alt", "title", "loading"].includes(name) && !val.startsWith("javascript:"));
+      if (!keep) el.removeAttribute(attr.name);
+    }
+    if (el.tagName === "A") el.setAttribute("rel", "noopener noreferrer");
+    if (el.tagName === "IMG" && !el.getAttribute("loading")) el.setAttribute("loading", "lazy");
+  }
+  remove.forEach((el) => el.replaceWith(document.createTextNode(el.textContent ?? "")));
+  return template.innerHTML;
 }
 
 function BlogPost() {
