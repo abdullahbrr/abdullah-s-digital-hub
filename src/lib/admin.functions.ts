@@ -41,8 +41,7 @@ type Table =
   | "awards"
   | "organizations"
   | "skill_groups"
-  | "writings"
-  | "blog_posts";
+  | "writings";
 
 
 export const upsertCollectionItem = createServerFn({ method: "POST" })
