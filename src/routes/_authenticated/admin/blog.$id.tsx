@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadMedia } from "@/lib/admin.functions";
-import { publishBlogPost, saveBlogDraft, unpublishBlogPost } from "@/lib/blog.functions";
+import { publishBlogPost, saveBlogDraft, unpublishBlogPost } from "@/lib/blog-admin.functions";
 import { Button, Card, Field, PageHeader, TextArea, TextInput, useToast } from "@/components/admin/ui";
 import { Upload, Eye, Save, Send } from "lucide-react";
 import { MediaImage } from "@/components/MediaImage";
