@@ -3,6 +3,10 @@ import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { getPostBySlug } from "@/lib/blog.functions";
 import { MediaImage } from "@/components/MediaImage";
 
+function formatDate(date: string) {
+  return new Intl.DateTimeFormat("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" }).format(new Date(date));
+}
+
 const postQuery = (slug: string) =>
   queryOptions({
     queryKey: ["blog", "post", slug],
@@ -105,7 +109,7 @@ function BlogPost() {
         <Link to="/blog" className="text-sm text-muted-foreground hover:text-foreground">← Blog</Link>
         <header className="mt-8">
           <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-            {post.published_at && <time>{new Date(post.published_at).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}</time>}
+            {post.published_at && <time>{formatDate(post.published_at)}</time>}
             {post.category && <span>· {post.category}</span>}
             {post.reading_minutes ? <span>· {post.reading_minutes} min read</span> : null}
             {post.author_name && <span>· {post.author_name}</span>}
