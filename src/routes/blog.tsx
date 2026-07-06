@@ -3,6 +3,10 @@ import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { listPublishedPosts } from "@/lib/blog.functions";
 import { MediaImage } from "@/components/MediaImage";
 
+function formatDate(date: string) {
+  return new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" }).format(new Date(date));
+}
+
 const postsQuery = queryOptions({
   queryKey: ["blog", "list"],
   queryFn: () => listPublishedPosts(),
@@ -73,7 +77,7 @@ function BlogList() {
                   )}
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                      {p.published_at && <time>{new Date(p.published_at).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}</time>}
+                      {p.published_at && <time>{formatDate(p.published_at)}</time>}
                       {p.category ? <span>· {p.category}</span> : null}
                       {p.reading_minutes ? <span>· {p.reading_minutes} min read</span> : null}
                     </div>

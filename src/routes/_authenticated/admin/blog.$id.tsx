@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadMedia } from "@/lib/admin.functions";
-import { publishBlogPost, saveBlogDraft, unpublishBlogPost } from "@/lib/blog.functions";
+import { publishBlogPost, saveBlogDraft, unpublishBlogPost } from "@/lib/blog-admin.functions";
 import { Button, Card, Field, PageHeader, TextArea, TextInput, useToast } from "@/components/admin/ui";
 import { Upload, Eye, Save, Send } from "lucide-react";
 import { MediaImage } from "@/components/MediaImage";
@@ -80,6 +80,19 @@ function BlogEditor() {
       const base64 = await fileToBase64(readyFile);
       const r = await upload({ data: { filename: readyFile.name, contentType: readyFile.type, base64, pathPrefix: "blog-covers" } });
       set("cover_url", r.url);
+      if (draft) {
+        saveMut.mutate({
+          row: {
+            ...draft,
+            cover_url: r.url,
+            title: (draft.title || "").trim() || "Untitled post",
+            slug: (draft.slug || "").trim() || slugify(draft.title || "") || `post-${Date.now()}`,
+            body: draft.body ?? "",
+            tags: Array.isArray(draft.tags) ? draft.tags : [],
+          },
+          publish: false,
+        });
+      }
       toast("ok", "Featured image uploaded");
     } catch (e) { toast("err", (e as Error).message); }
   }

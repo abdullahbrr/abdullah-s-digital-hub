@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
-import { createBlogDraft, deleteBlogPost } from "@/lib/blog.functions";
+import { createBlogDraft, deleteBlogPost } from "@/lib/blog-admin.functions";
 import { Button, Card, PageHeader, useToast } from "@/components/admin/ui";
 import { Plus, Trash2, ExternalLink } from "lucide-react";
 

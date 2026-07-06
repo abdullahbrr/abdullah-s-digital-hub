@@ -41,8 +41,7 @@ type Table =
   | "awards"
   | "organizations"
   | "skill_groups"
-  | "writings"
-  | "blog_posts";
+  | "writings";
 
 
 export const upsertCollectionItem = createServerFn({ method: "POST" })
@@ -95,9 +94,24 @@ export const uploadMedia = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const admin = getAdminClient(context as any);
+    const allowedTypes = new Set([
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/gif",
+      "image/svg+xml",
+      "application/pdf",
+    ]);
+    if (!allowedTypes.has(data.contentType)) {
+      throw new Error("Unsupported file type. Upload JPG, PNG, WebP, GIF, SVG, or PDF.");
+    }
+    if (!data.base64 || data.base64.length > 16_000_000) {
+      throw new Error("File is too large or empty. Upload a smaller file.");
+    }
     const bytes = Uint8Array.from(atob(data.base64), (c) => c.charCodeAt(0));
     const safeName = data.filename.replace(/[^a-zA-Z0-9._-]/g, "_");
-    const path = `${data.pathPrefix ?? "uploads"}/${Date.now()}-${safeName}`;
+    const safePrefix = (data.pathPrefix ?? "uploads").replace(/[^a-zA-Z0-9/_-]/g, "_").replace(/^\/+|\/+$/g, "") || "uploads";
+    const path = `${safePrefix}/${Date.now()}-${safeName}`;
     const { error } = await admin.storage.from("media").upload(path, bytes, {
       contentType: data.contentType,
       upsert: false,
