@@ -80,6 +80,19 @@ function BlogEditor() {
       const base64 = await fileToBase64(readyFile);
       const r = await upload({ data: { filename: readyFile.name, contentType: readyFile.type, base64, pathPrefix: "blog-covers" } });
       set("cover_url", r.url);
+      if (draft) {
+        saveMut.mutate({
+          row: {
+            ...draft,
+            cover_url: r.url,
+            title: (draft.title || "").trim() || "Untitled post",
+            slug: (draft.slug || "").trim() || slugify(draft.title || "") || `post-${Date.now()}`,
+            body: draft.body ?? "",
+            tags: Array.isArray(draft.tags) ? draft.tags : [],
+          },
+          publish: false,
+        });
+      }
       toast("ok", "Featured image uploaded");
     } catch (e) { toast("err", (e as Error).message); }
   }
