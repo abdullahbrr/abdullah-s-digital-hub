@@ -1,7 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { getSiteContent } from "@/lib/content.functions";
 import { Nav } from "@/components/portfolio/Nav";
 import { Hero } from "@/components/portfolio/Hero";
@@ -59,34 +57,10 @@ function applyThemePreset(id?: string) {
 }
 
 function Home() {
-  const loaderData = Route.useLoaderData();
-  const fetchContent = useServerFn(getSiteContent);
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["site-content"],
-    queryFn: () => fetchContent(),
-    initialData: loaderData,
-    staleTime: 30_000,
-  });
+  const data = Route.useLoaderData();
 
   useEffect(() => { applyThemePreset(data?.settings?.theme?.preset); }, [data]);
 
-  if (isError) {
-    return (
-      <div className="grid min-h-dvh place-items-center bg-background px-4">
-        <div className="max-w-md text-center">
-          <p className="text-lg font-semibold text-foreground">Could not load portfolio</p>
-          <p className="mt-2 text-sm text-muted-foreground">{(error as Error)?.message ?? "Unknown error"}</p>
-          <button onClick={() => window.location.reload()} className="mt-4 rounded-full bg-gradient-brand px-5 py-2 text-sm font-semibold text-brand-foreground">
-            Try again
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (isLoading || !data) {
-    return <div className="grid min-h-dvh place-items-center bg-background text-muted-foreground">Loading…</div>;
-  }
 
   const s = data.settings;
   const profile = s.profile ?? {};
