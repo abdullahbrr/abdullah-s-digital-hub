@@ -9,7 +9,25 @@ import { updateSiteSettings, uploadMedia } from "@/lib/admin.functions";
 import { Button, Card, Field, PageHeader, TextInput, useToast } from "@/components/admin/ui";
 import { Upload } from "lucide-react";
 import { MediaImage } from "@/components/MediaImage";
-import { fileToBase64, prepareImageFile } from "@/lib/media-upload.client";
+function isHeicFile(file: File) {
+  return /\.(heic|heif)$/i.test(file.name) || /image\/(heic|heif)/i.test(file.type);
+}
+
+async function prepareImageFile(file: File): Promise<File> {
+  if (isHeicFile(file)) {
+    throw new Error("HEIC photos are not supported by browsers. Please upload JPG, PNG, WebP, or GIF.");
+  }
+  return file;
+}
+
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve((reader.result as string).split(",")[1] ?? "");
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
 
 export const Route = createFileRoute("/_authenticated/admin/media")({
   component: MediaAdmin,

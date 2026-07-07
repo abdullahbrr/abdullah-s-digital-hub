@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { updateSiteSettings, uploadMedia } from "@/lib/admin.functions";
 import { Button, Card, Field, PageHeader, TextArea, TextInput, useToast } from "@/components/admin/ui";
 import { MediaImage } from "@/components/MediaImage";
-import { fileToBase64, prepareImageFile } from "@/lib/media-upload.client";
+import { fileToBase64, prepareImageFile } from "@/lib/media-upload";
 
 export const Route = createFileRoute("/_authenticated/admin/story")({
   component: StoryAdmin,

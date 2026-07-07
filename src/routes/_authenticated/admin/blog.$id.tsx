@@ -8,7 +8,7 @@ import { publishBlogPost, saveBlogDraft, unpublishBlogPost } from "@/lib/blog-ad
 import { Button, Card, Field, PageHeader, TextArea, TextInput, useToast } from "@/components/admin/ui";
 import { Upload, Eye, Save, Send } from "lucide-react";
 import { MediaImage } from "@/components/MediaImage";
-import { fileToBase64, prepareImageFile } from "@/lib/media-upload.client";
+import { fileToBase64, prepareImageFile } from "@/lib/media-upload";
 
 export const Route = createFileRoute("/_authenticated/admin/blog/$id")({
   component: BlogEditor,

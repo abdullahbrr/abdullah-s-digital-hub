@@ -30,7 +30,7 @@ import {
 } from "@/lib/admin.functions";
 import { Button, Card, Field, TextArea, TextInput, useToast } from "./ui";
 import { MediaImage } from "@/components/MediaImage";
-import { fileToBase64, prepareImageFile } from "@/lib/media-upload.client";
+import { fileToBase64, prepareImageFile } from "@/lib/media-upload";
 
 type FieldKind = "text" | "textarea" | "tags" | "image";
 export type FieldDef = { name: string; label: string; kind: FieldKind; placeholder?: string };
